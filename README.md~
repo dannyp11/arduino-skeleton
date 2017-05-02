@@ -19,7 +19,7 @@ Note: this repo doesn't support Arduino IDE. Everything must be run from Makefil
 	+---doc					- documentations
 	
 # Usage
-	go to c*-project/with*-os/ directory and use its makefile
+	go to c*-project directory and use its makefile
 	
 # Question & Bug fix?
 	Please email author tdpham1105@yahoo.com
