@@ -14,7 +14,7 @@
 /*
  serial_in - Read a byte from the USART0 and return it
  */
-char serial_in()
+char SerialDebugGetChar()
 {
 	while (!( UCSR0A & (1 << RXC0)))
 		;
@@ -60,5 +60,20 @@ void SerialDebugInit()
 void SerialDebugPrint(char* message)
 {
 	sci_outs(message);
+	sci_outs("\n\r");
+}
+
+void SerialDebugGetLine(char* buffer)
+{
+	uint8_t i = 0;
+	while (1)
+	{
+		buffer[i] = SerialDebugGetChar();
+		sci_out(buffer[i]); // echo
+		if (buffer[i] == '\n' || buffer[i] == '\r') break;
+		++i;
+	}
+	buffer[i] = '\0';
+
 	sci_outs("\n\r");
 }

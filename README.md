@@ -17,6 +17,7 @@ Note: this repo doesn't support Arduino IDE. Everything must be run from Makefil
 	|	+---with-os/		-
 	|	+---without-os/		-
 	+---doc					- documentations
+	+---common/				- includes common makefiles for all projects
 	
 # Usage
 	go to c*-project/with*-os/ directory and use its makefile
