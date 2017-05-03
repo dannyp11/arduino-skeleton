@@ -6,6 +6,7 @@
  */
 
 #include <avr/io.h>
+#include <stdio.h>
 #include "SerialDebug.h"
 
 #define BAUD 9600              // Baud rate used by the LCD
@@ -35,7 +36,7 @@ void sci_out(char ch)
  sci_outs - Print the contents of the character string "s" out the SCI
  port. The string must be terminated by a zero byte.
  */
-void sci_outs(char *s)
+void sci_outs(const char *s)
 {
 	unsigned char ch;
 
@@ -52,12 +53,15 @@ void SerialDebugInit()
 	UCSR0B |= (1 << RXEN0); // Turn on receiver
 	UCSR0C = (3 << UCSZ00);  // Set for asynchronous operation, no parity,
 							 // one stop bit, 8 data bits
+
+	SerialDebugPrint("Serial Debug activated");
+	SerialDebugPrint("Compiled on : %s %s", __DATE__, __TIME__);
 }
 
 /*
  * Printf to serial port
  */
-void SerialDebugPrint(char* message)
+void SerialDebugPrint1(const char* message)
 {
 	sci_outs(message);
 	sci_outs("\n\r");

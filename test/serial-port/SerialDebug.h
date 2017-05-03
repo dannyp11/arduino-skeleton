@@ -8,8 +8,10 @@
 #ifndef SERIALDEBUG_H_
 #define SERIALDEBUG_H_
 
+#include <stdio.h>
+
 #ifndef FOSC
-#define FOSC 16000000		// Clock frequency
+#define FOSC F_CPU		// Clock frequency
 #endif
 
 /*
@@ -20,7 +22,12 @@ void SerialDebugInit(void);
 /*
  * Printf to serial port
  */
-void SerialDebugPrint(char* message);
+#define SerialDebugPrint(arg...) \
+{ 	char _msg[128];\
+	snprintf(_msg, 128, ##arg); \
+	SerialDebugPrint1(_msg); \
+}
+void SerialDebugPrint1(const char* message);
 
 /*
  * Fetches byte from receive buffer
