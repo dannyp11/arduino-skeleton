@@ -25,9 +25,9 @@ void SerialDebugInit(void);
 #define SerialDebugPrint(arg...) \
 { 	char _msg[128];\
 	snprintf(_msg, 128, ##arg); \
-	SerialDebugPrint1(_msg); \
+	_SerialDebugPrint1(_msg); \
 }
-void SerialDebugPrint1(const char* message);
+void _SerialDebugPrint1(const char* message);
 
 /*
  * Fetches byte from receive buffer

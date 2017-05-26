@@ -10,7 +10,7 @@
 #include "SerialDebug.h"
 
 #define BAUD 9600              // Baud rate used by the LCD
-#define MYUBRR FOSC/16/BAUD-1   // Value for UBRR0 register
+#define MYUBRR F_CPU/16/BAUD-1   // Value for UBRR0 register
 
 /*
  serial_in - Read a byte from the USART0 and return it
@@ -61,7 +61,7 @@ void SerialDebugInit()
 /*
  * Printf to serial port
  */
-void SerialDebugPrint1(const char* message)
+void _SerialDebugPrint1(const char* message)
 {
 	sci_outs(message);
 	sci_outs("\n\r");

@@ -1,4 +1,4 @@
-TOP		   = ../
+TOP		   ?= ${CURDIR}/..
 
 # Arduino specific
 DEVICE     = atmega328p
@@ -10,7 +10,6 @@ FUSES      = -U hfuse:w:0xd9:m -U lfuse:w:0xe0:m
 
 # OS specific
 OS_DIR     = $(TOP)/os/ChibiOS/
-
 
 ###########################################################################
 CC ?=avr-gcc

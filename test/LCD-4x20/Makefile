@@ -5,9 +5,9 @@ TOP = ../../
 
 # required
 SOURCES = $(wildcard *.c)
-INCLUDES = ./
+INCLUDES = ./ 
 
-# extra utils such as soft serial, i2c, serial debug
+# extra utils such as soft serial, i2c
 SOURCES	  += $(wildcard $(TOP)/common/utils/*.c)
 INCLUDES  += $(TOP)/common/utils/ 
 

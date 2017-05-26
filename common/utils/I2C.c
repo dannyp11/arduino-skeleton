@@ -1,178 +1,14 @@
+/*
+ * I2C.c
+ *
+ *  Created on: May 25, 2017
+ *      Author: dat
+ */
+
+#include "I2C.h"
 #include <avr/io.h>
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <util/delay.h>
-#include <util/twi.h>
-
-#include "Compass.h"
-#include "SerialDebug.h"
-#include "i2c.h"
-
-// Find divisors for the UART0 and I2C baud rates
-#ifndef FOSC
-#define FOSC F_CPU            // Clock frequency = Oscillator freq.
-#endif
-#define BDIV (FOSC / 100000 - 16) / 2 + 1    // Puts I2C rate just below 100kHz
-
-void Compassi2c_init(uint8_t bdiv);
-uint8_t Compassi2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
-		uint8_t *wp, uint16_t wn, uint8_t *rp, uint16_t rn);
-
-#define COMPASS_ADDR  0x3d
-
-/*
- * Calibrated values
- */
-#define	CALIBRATED_OFFSET -60.0
-#define TRUE_S	180.0
-#define TRUE_W	270.0
-#define TRUE_E	90.0
-#define TRUE_NW	315.0
-#define TRUE_NE	45.0
-#define TRUE_SW	225.0
-#define TRUE_SE	135.0
-#define TOLERANCE	22.0
-
-/*
- * Private Variables
- */
-static int16_t x, y, z;
-static float mHeader;
-static uint8_t result[6];
-static uint8_t cmd[2];
-
-uint8_t CompassGetDirectionText(char * buffer, CompassDirection direction) {
-	uint8_t retVal = 0;
-
-	switch (direction) {
-	case NORTH: {
-		snprintf(buffer, 6, "North");
-		retVal = 5;
-	}
-		break;
-	case EAST: {
-		snprintf(buffer, 5, "East");
-		retVal = 4;
-	}
-		break;
-	case SOUTH: {
-		snprintf(buffer, 6, "South");
-		retVal = 5;
-	}
-		break;
-	case WEST: {
-		snprintf(buffer, 5, "West");
-		retVal = 4;
-	}
-		break;
-	case NORTHEAST: {
-		snprintf(buffer, 10, "NorthEast");
-		retVal = 9;
-	}
-		break;
-	case NORTHWEST: {
-		snprintf(buffer, 10, "NorthWest");
-		retVal = 9;
-	}
-		break;
-	case SOUTHEAST: {
-		snprintf(buffer, 10, "SouthEast");
-		retVal = 9;
-	}
-		break;
-	case SOUTHWEST: {
-		snprintf(buffer, 10, "SouthWest");
-		retVal = 9;
-	}
-		break;
-	default:
-		break;
-	}
-
-	return retVal;
-}
-
-float CompassGetAngle() {
-	cmd[0] = 0x03;
-	Compassi2c_io(COMPASS_ADDR, cmd, 1, 0, 0, result, 6);
-
-	x = (int16_t) (((int16_t) result[0] << 8) | result[1]);
-	z = (int16_t) (((int16_t) result[2] << 8) | result[3]);
-	y = (int16_t) (((int16_t) result[4] << 8) | result[5]);
-
-	mHeader = atan2(x, y) * 180.0 / M_PI + CALIBRATED_OFFSET;
-	if (mHeader < 0)
-		mHeader += 360.0;
-
-	return mHeader;
-}
-
-CompassDirection CompassGetDirection() {
-	CompassDirection retVal = NORTH;
-
-	CompassGetAngle();
-
-	if (abs(mHeader - TRUE_S) < TOLERANCE)
-		retVal = SOUTH;
-	else if (abs(mHeader - TRUE_W) < TOLERANCE)
-		retVal = WEST;
-	else if (abs(mHeader - TRUE_E) < TOLERANCE)
-		retVal = EAST;
-	else if (abs(mHeader - TRUE_SW) < TOLERANCE)
-		retVal = SOUTHWEST;
-	else if (abs(mHeader - TRUE_SE) < TOLERANCE)
-		retVal = SOUTHEAST;
-	else if (abs(mHeader - TRUE_NE) < TOLERANCE)
-		retVal = NORTHEAST;
-	else if (abs(mHeader - TRUE_NW) < TOLERANCE)
-		retVal = NORTHWEST;
-
-	return retVal;
-}
-
-void CompassInit() {
-	/*
-	 * Compass stuff
-	 */
-//	Compassi2c_init(BDIV);
-//
-//	cmd[0] = 0x02;
-//	cmd[1] = 0x00;
-//
-//	Compassi2c_io(COMPASS_ADDR, cmd, 2, 0, 0, 0, 0);
-//
-////	cmd[0] = 0x00;
-////	cmd[1] = 0x90;
-////	Compassi2c_io(COMPASS_ADDR, cmd, 2, 0, 0, 0, 0);
-//
-////	uint8_t res[3];
-////	res[0] = 10;
-//	result[0] = 10;
-//	cmd[0] = 0x02;
-//	Compassi2c_io(COMPASS_ADDR, cmd, 1, 0, 0, result, 1);
-//	SerialDebugPrint("result %d", result[0]);
-//
-//	while (1)
-//	{
-//		cmd[0] = 0x03;
-//		Compassi2c_io(COMPASS_ADDR, cmd, 1, 0, 0, result, 6);
-//		SerialDebugPrint("result %d %d ", result[0], result[1]);
-//
-//		_delay_ms(500);
-//	}
-	cmd[0] = 0;
-	i2cInit();
-	writeRegisters(0x19, 0x02, 1, cmd);
-
-	SerialDebugPrint("reg %d", readRegister(0x19, 0x02));
-	_delay_ms(500);
-
-	while (1) {
-		SerialDebugPrint("mag %d", readRegister(0x19, 0x04));
-		_delay_ms(500);
-	}
-}
+#include <compat/twi.h>
 
 /*
  i2c_io - write and read bytes to a slave I2C device
@@ -233,8 +69,8 @@ void CompassInit() {
  i2c_io(0xD0, abuf, 1, NULL, 0, rbuf, 20);
  */
 
-uint8_t Compassi2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
-		uint8_t *wp, uint16_t wn, uint8_t *rp, uint16_t rn) {
+uint8_t i2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an, uint8_t *wp,
+		uint16_t wn, uint8_t *rp, uint16_t rn, uint8_t delayEveryByte) {
 	uint8_t status, send_stop;
 	uint8_t wrote, start_stat;
 
@@ -242,7 +78,8 @@ uint8_t Compassi2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
 	wrote = 0;
 	send_stop = 0;
 
-	if (an > 0 || wn > 0) {
+	if (an > 0 || wn > 0)
+	{
 		wrote = 1;
 		send_stop = 1;
 
@@ -258,7 +95,8 @@ uint8_t Compassi2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
 		while (!(TWCR & (1 << TWINT)))
 			;     // Wait for TWINT to be set
 		status = TWSR & 0xf8;
-		if (status != 0x18) {               // Check that SLA+W was sent OK
+		if (status != 0x18)
+		{               // Check that SLA+W was sent OK
 			if (status == 0x20)             // Check for NAK
 				goto nakstop;
 			// Send STOP condition
@@ -266,43 +104,54 @@ uint8_t Compassi2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
 		}
 
 		// Write "an" data bytes to the slave device
-		while (an-- > 0) {
+		while (an-- > 0)
+		{
 			TWDR = *ap++;                   // Put next data byte in TWDR
 			TWCR = (1 << TWINT) | (1 << TWEN); // Start transmission
 			while (!(TWCR & (1 << TWINT)))
 				; // Wait for TWINT to be set
 			status = TWSR & 0xf8;
-			if (status != 0x28) {           // Check that data was sent OK
+			if (status != 0x28)
+			{           // Check that data was sent OK
 				if (status == 0x30)         // Check for NAK
 					goto nakstop;
 				// Send STOP condition
 				return (status);             // Otherwise just return the status
 			}
 
-			_delay_ms(1);
+			if (delayEveryByte)
+			{
+				_delay_us(50);
+			}
 		}
 
 		// Write "wn" data bytes to the slave device
-		while (wn-- > 0) {
+		while (wn-- > 0)
+		{
 			TWDR = *wp++;                   // Put next data byte in TWDR
 			TWCR = (1 << TWINT) | (1 << TWEN); // Start transmission
 			while (!(TWCR & (1 << TWINT)))
 				; // Wait for TWINT to be set
 			status = TWSR & 0xf8;
-			if (status != 0x28) {           // Check that data was sent OK
+			if (status != 0x28)
+			{           // Check that data was sent OK
 				if (status == 0x30)         // Check for NAK
 					goto nakstop;
 				// Send STOP condition
 				return (status);             // Otherwise just return the status
 			}
 
-			_delay_ms(1);
+			if (delayEveryByte)
+			{
+				_delay_us(50);
+			}
 		}
 
 		status = 0;                         // Set status value to successful
 	}
 
-	if (rn > 0) {
+	if (rn > 0)
+	{
 		send_stop = 1;
 
 		// Set the status value to check for depending on whether this is a
@@ -324,7 +173,8 @@ uint8_t Compassi2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
 		while (!(TWCR & (1 << TWINT)))
 			;     // Wait for TWINT to be set
 		status = TWSR & 0xf8;
-		if (status != 0x40) {               // Check that SLA+R was sent OK
+		if (status != 0x40)
+		{               // Check that SLA+R was sent OK
 			if (status == 0x48)             // Check for NAK
 				goto nakstop;
 			return (status);
@@ -332,7 +182,8 @@ uint8_t Compassi2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
 
 		// Read all but the last of n bytes from the slave device in this loop
 		rn--;
-		while (rn-- > 0) {
+		while (rn-- > 0)
+		{
 			TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWEA); // Read byte and send ACK
 			while (!(TWCR & (1 << TWINT)))
 				; // Wait for TWINT to be set
@@ -340,8 +191,6 @@ uint8_t Compassi2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
 			if (status != 0x50)             // Check that data received OK
 				return (status);
 			*rp++ = TWDR;                   // Read the data
-
-			_delay_ms(1);
 		}
 
 		// Read the last byte
@@ -366,7 +215,38 @@ uint8_t Compassi2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
 /*
  i2c_init - Initialize the I2C port
  */
-void Compassi2c_init(uint8_t bdiv) {
+void i2c_init(uint8_t bdiv) {
 	TWSR = 0;                           // Set prescalar for 1
 	TWBR = bdiv;                        // Set bit rate register
+}
+
+static volatile uint8_t _i2cIsRunning;
+void I2CInit(void) {
+	static uint8_t isInited = 0;
+	if (isInited) return;
+	isInited = 1;
+
+	_i2cIsRunning = 1;
+	uint8_t bdiv = (F_CPU / 100000 - 16) / 2 + 1;
+	i2c_init(bdiv);
+	_i2cIsRunning = 0;
+}
+
+uint8_t I2CSendData(uint8_t address, uint8_t * data, uint8_t datalen, uint8_t isSlowTX) {
+	while (_i2cIsRunning);
+	_i2cIsRunning = 1;
+	uint8_t result = i2c_io(address << 1, data, datalen, 0, 0, 0, 0, isSlowTX);
+	_i2cIsRunning = 0;
+
+	return result;
+}
+
+uint8_t I2CSendnRecvData(uint8_t address, uint8_t * txdata, uint8_t txdatalen,
+		uint8_t * rxdata, uint8_t rxdatalen, uint8_t isSlowTX) {
+	while (_i2cIsRunning);
+	_i2cIsRunning = 1;
+	uint8_t result = i2c_io(address << 1, txdata, txdatalen, 0, 0, rxdata, rxdatalen, isSlowTX);
+	_i2cIsRunning = 0;
+
+	return result;
 }
