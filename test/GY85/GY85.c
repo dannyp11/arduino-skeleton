@@ -8,12 +8,15 @@
 #include "GY85.h"
 #include "I2C.h"
 #include "SerialDebug.h"
+#include "LCD.h"
 
 #include <math.h>
 #include <util/delay.h>
 
 // addresses ---------------------------
 #define COMPASS_ADDR	0x1e
+#define ACCEL_ADDR		0x53
+#define GYRO_ADDR		0x69
 // -------------------------------------
 
 /*
@@ -62,15 +65,18 @@ void GY85Init(void)
 	I2CSendData(COMPASS_ADDR, cmd, 2, 0);
 	// ----------------------------------------------------
 
-	SerialDebugInit();
+}
 
-	while (1)
-	{
-		SerialDebugPrint("data %f", GY85CompassGetAngle());
+uint8_t GY85CompassGetRawData(GY85CompassData * data)
+{
+	uint8_t res = 1;
 
-		_delay_ms(5);
-	}
+	cmd[0] = 0x03;
+	res = I2CSendnRecvData(COMPASS_ADDR, cmd, 1, result, 6, 0);
 
-//	SerialDebugPrint("data %f", 1.2);
+	data->x = (int16_t) (((int16_t) result[0] << 8) | result[1]);
+	data->z = (int16_t) (((int16_t) result[2] << 8) | result[3]);
+	data->y = (int16_t) (((int16_t) result[4] << 8) | result[5]);
 
+	return res;
 }

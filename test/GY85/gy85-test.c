@@ -16,7 +16,7 @@ int main()
 	LCDInit();
 
 	GY85Init();
-	I2CInit();
+//	I2CInit();
 
 	uint8_t cmd[3];
 	uint8_t data[6];

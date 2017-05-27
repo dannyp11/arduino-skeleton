@@ -5,6 +5,8 @@
 #ifndef LCD_H_
 #define LCD_H_
 
+#include <stdio.h>
+
 #define LCD_LINE_LEN 20 // max length of each line
 
 typedef enum _LCDCommand
@@ -36,7 +38,12 @@ void LCDReset(void);
  * input: msg
  * return value: 0 on success
  */
-uint8_t LCDPrint(const char* msg);
+#define LCDPrint(arg...) \
+{ 	char _msg[21];\
+	snprintf(_msg, 21, ##arg); \
+	_LCDPrint(_msg); \
+}
+uint8_t _LCDPrint(const char* msg);
 
 /*
  * Pretty straightforward: send command in the LCDCommand enum above

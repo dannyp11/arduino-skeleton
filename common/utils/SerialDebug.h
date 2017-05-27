@@ -10,10 +10,6 @@
 
 #include <stdio.h>
 
-#ifndef FOSC
-#define FOSC F_CPU		// Clock frequency
-#endif
-
 /*
  * Init serial port
  */

@@ -233,7 +233,8 @@ void I2CInit(void) {
 }
 
 uint8_t I2CSendData(uint8_t address, uint8_t * data, uint8_t datalen, uint8_t isSlowTX) {
-	while (_i2cIsRunning);
+	if (_i2cIsRunning) return 1;
+
 	_i2cIsRunning = 1;
 	uint8_t result = i2c_io(address << 1, data, datalen, 0, 0, 0, 0, isSlowTX);
 	_i2cIsRunning = 0;
@@ -243,7 +244,8 @@ uint8_t I2CSendData(uint8_t address, uint8_t * data, uint8_t datalen, uint8_t is
 
 uint8_t I2CSendnRecvData(uint8_t address, uint8_t * txdata, uint8_t txdatalen,
 		uint8_t * rxdata, uint8_t rxdatalen, uint8_t isSlowTX) {
-	while (_i2cIsRunning);
+	if (_i2cIsRunning) return 1;
+
 	_i2cIsRunning = 1;
 	uint8_t result = i2c_io(address << 1, txdata, txdatalen, 0, 0, rxdata, rxdatalen, isSlowTX);
 	_i2cIsRunning = 0;

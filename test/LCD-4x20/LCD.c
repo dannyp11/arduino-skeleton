@@ -151,6 +151,10 @@ uint8_t LCDSetCursor(char line, char position)
 
 void LCDInit()
 {
+	static uint8_t isInited = 0;
+	if (isInited) return;
+	isInited = 1;
+
 	I2CInit();             // Initialize the I2C port
 	mSleepms(200);
 
@@ -160,7 +164,7 @@ void LCDInit()
 	LCDReset();
 }
 
-uint8_t LCDPrint(const char *msg)
+uint8_t _LCDPrint(const char *msg)
 {
 	uint8_t status;
 
@@ -183,7 +187,7 @@ void LCDReset()
 	LCDSendCommand(CLEARSCREEN);
 	LCDSendCommand(CURSORHOME);
 	LCDSendCommand(CURSOROFF);
-	LCDSetContrast(40);
+	LCDSetContrast(48);
 	LCDSetBrightness(8);
 }
 // End LCD APIs -------------------------------------------------------------

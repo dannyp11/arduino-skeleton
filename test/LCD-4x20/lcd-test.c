@@ -19,13 +19,17 @@
 #include <string.h>
 
 #include "LCD.h"
+#include "LCDContrastChanger.h"
 
 #define BUFF_LEN LCD_LINE_LEN + 1
 
 int main()
 {
 	char buffer[BUFF_LEN];
+	uint8_t contrastLevel;
 
+	LCDContrastChangerInit();
+	LCDContrastChangerSetVariable(&contrastLevel);
 	LCDInit();
 	LCDSendCommand(CURSOROFF);
 	LCDSendCommand(SHOWFIRMWARE);
@@ -115,9 +119,10 @@ int main()
 	LCDSetCursor(2, 5);
 	LCDPrint("Done demo");
 
+	// contrast is manually changed here since i2c is not async
 	while (1)
 	{
-
+		LCDSetContrast(contrastLevel);
 	}
 
 	return 0;
