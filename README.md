@@ -7,20 +7,22 @@ Currently works with Unix system
 Note: this repo doesn't support Arduino IDE. Everything must be run from Makefile, because of reason
 
 # Directory Structure
-	+---test/ 				- all component testers go here, test code uses no os
-	+---os/					- optional RTOS (currently ChibiOS)
-	|	+---ChibiOS/		- 
-	+---c-project/			- skeleton  for C based projects using avr-gcc
-	|	+---with-os/		-
-	|	+---without-os/		-
-	+---cpp-project/		- skeleton  for C++ based projects using avr-g++
-	|	+---with-os/		-
-	|	+---without-os/		-
-	+---doc					- documentations
-	+---common/				- includes common makefiles for all projects
+	+---test/                               - all component testers go here, test code uses no os
+	+---os/                                 - optional RTOS (currently ChibiOS)
+	|       +---ChibiOS/                    - 
+	+---c-project/                          - skeleton  for C based projects using avr-gcc
+	|       +---with-os/                    -
+	|	+---without-os/                 -
+	+---cpp-project/                        - skeleton  for C++ based projects using avr-g++
+	|	+---with-os/                    -
+	|	+---without-os/                 -
+	+---doc                                 - documentations
+	+---common/                             - includes common makefiles for all projects
+        |       +---utils/                      - common protocols such as soft serial, i2c, debugging
 	
 # Usage
 	go to c*-project/with*-os/ directory and use its makefile
+        go to test/ to checkout individual moduie test code, all code here must be in C
 	
 # Question & Bug fix?
 	Please email author tdpham1105@yahoo.com
