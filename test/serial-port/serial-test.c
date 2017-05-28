@@ -28,7 +28,7 @@ int main(void)
 	while (1)
 	{
 		SerialDebugPrint("Please enter a number :");
-		SerialDebugGetLine(buffer);
+		SerialDebugGetLine(buffer, 1);
 		SerialDebugPrint("Entered number: ");
 		SerialDebugPrint(buffer);
 

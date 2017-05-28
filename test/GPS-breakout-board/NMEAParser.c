@@ -32,6 +32,10 @@ uint8_t checkSum(const char * message)
 
 	if (message[0] != '$') return retVal;
 	const char* token = strchr(message, '*');
+	if (token == NULL)
+	{
+		return retVal;
+	}
 
 	char target[128];
 	strncpy(target, message + 1, token - message - 1);
@@ -53,7 +57,39 @@ uint8_t checkSum(const char * message)
 }
 
 /**
- * WIP - RMC msg
+ * internal function - parse GPGGA message
+ *
+ * @param message
+ * @param result
+ * @param errcode
+ * @return
+ */
+uint8_t parseGGA(const char * message, NMEAData * result, uint8_t errcode)
+{
+
+
+	return errcode;
+}
+
+/**
+ * internal function - parse GPRMC message
+ *
+ * @param message
+ * @param result
+ * @param errcode
+ * @return
+ */
+uint8_t parseRMC(const char * message, NMEAData * result, uint8_t errcode)
+{
+
+
+	return errcode;
+}
+
+/**
+ * Supported - RMC
+ *
+ * WIP - GGA
  *
  * @param message
  * @param result
@@ -88,7 +124,11 @@ uint8_t NMEAParserParseString(const char * message, NMEAData * result)
 		{
 		case FUNCTION:
 		{
-			if (strcmp(token_str, "$GPRMC") != 0)
+			if (strcmp(token_str, "$GPGGA") == 0)
+			{
+				retVal = parseGGA(message, result, retVal);
+			}
+			else if (strcmp(token_str, "$GPRMC") != 0)
 			{
 				retVal = 1;
 			}

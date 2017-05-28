@@ -67,17 +67,24 @@ void _SerialDebugPrint1(const char* message)
 	sci_outs("\n\r");
 }
 
-void SerialDebugGetLine(char* buffer)
+void SerialDebugGetLine(char* buffer, char echo)
 {
 	uint8_t i = 0;
 	while (1)
 	{
 		buffer[i] = SerialDebugGetChar();
-		sci_out(buffer[i]); // echo
-		if (buffer[i] == '\n' || buffer[i] == '\r') break;
+		if (echo)
+		{
+			sci_out(buffer[i]); // echo
+		}
+		if (buffer[i] == '\n' || buffer[i] == '\r')
+			break;
 		++i;
 	}
 	buffer[i] = '\0';
 
-	sci_outs("\n\r");
+	if (echo)
+	{
+		sci_outs("\n\r");
+	}
 }

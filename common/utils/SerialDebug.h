@@ -36,7 +36,8 @@ char SerialDebugGetChar(void);
  *
  * @param buffer - line will be stored in here, make sure buffer is allocated
  * 					before calling this function
+ * @param echo - 1 will echo character to console
  */
-void SerialDebugGetLine(char* buffer);
+void SerialDebugGetLine(char* buffer, char echo);
 
 #endif /* SERIALDEBUG_H_ */
