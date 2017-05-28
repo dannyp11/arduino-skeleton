@@ -10,7 +10,6 @@ FUSES      = -U hfuse:w:0xd9:m -U lfuse:w:0xe0:m
 
 # OS specific
 OS_DIR     = $(TOP)/os/ChibiOS/
-
 ###########################################################################
 CC ?=avr-gcc
 BINARY_NAME ?=main.elf
@@ -45,6 +44,8 @@ AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
 COMPILE = $(CC) $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(IFLAGS)
 
 # symbolic targets:
+.default: all
+
 all:	main.hex
 	
 	
@@ -80,7 +81,7 @@ install: flash fuse
 load: all
 	bootloadHID main.hex
 
-clean:
+clean: 
 	rm -f main.hex $(BINARY_NAME) $(OBJECTS)
 
 # file targets:

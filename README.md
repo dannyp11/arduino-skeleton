@@ -20,6 +20,9 @@ Note: this repo doesn't support Arduino IDE. Everything must be run from Makefil
 	+---common/                             - includes common makefiles for all projects
         |       +---utils/                      - common protocols such as soft serial, i2c, debugging
 	
+# UnitTest framework (Software)
+This repo supports cxxtest framework, run make check will invoke testgen and run the test binary
+
 # Usage
 	go to c*-project/with*-os/ directory and use its makefile
         go to test/ to checkout individual moduie test code, all code here must be in C
