@@ -25,7 +25,7 @@ test_gen:
 check: test_gen 
 	$(MAKE) TEST_COMPILE
 	-$(foreach bin, $(TEST_BINARIES), ./$(bin).test; )
-	$(MAKE) testclean
+	$(MAKE) testclean > /dev/null
 
 TEST_COMPILE: $(TEST_OBJECTS) $(TEST_BIN_OBJS)
 	$(foreach bin, $(TEST_BINARIES), $(TEST_CC) $(CFLAGS) $(IFLAGS) $(TEST_OBJECTS) $(bin) -o $(bin).test ;)

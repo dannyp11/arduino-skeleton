@@ -12,8 +12,8 @@
 
 typedef struct _NMEALocation
 {
-	float lat_deg, lat_min; // degree sign + for N, E, - for S, W
-	float lon_deg, lon_min;
+	int lat_deg, lon_deg; // degree sign + for N, E, - for S, W
+	float lat_min, lon_min;
 } NMEALocation;
 
 typedef struct _NMEAData

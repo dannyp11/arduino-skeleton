@@ -22,6 +22,37 @@ enum TOKEN_RMC
 };
 
 /**
+ * checksum NMEA message
+ * @param message
+ * @return 0 on success, 1 on fail
+ */
+uint8_t checkSum(const char * message)
+{
+	uint8_t retVal = 1;
+
+	if (message[0] != '$') return retVal;
+	const char* token = strchr(message, '*');
+
+	char target[128];
+	strncpy(target, message + 1, token - message - 1);
+
+	int expectedCkSum;
+	sscanf(token, "*%x", &expectedCkSum);
+
+	int i;
+	int actualCksum = 0;
+	for ( i = 0; i < strlen(target); ++i)
+	{
+		actualCksum ^= target[i];
+	}
+
+	if (actualCksum == expectedCkSum)
+		retVal = 0;
+
+	return retVal;
+}
+
+/**
  * WIP - RMC msg
  *
  * @param message
@@ -59,7 +90,6 @@ uint8_t NMEAParserParseString(const char * message, NMEAData * result)
 		{
 			if (strcmp(token_str, "$GPRMC") != 0)
 			{
-				printf("hi\n");
 				retVal = 1;
 			}
 		}
@@ -67,17 +97,112 @@ uint8_t NMEAParserParseString(const char * message, NMEAData * result)
 
 		case TIMESTAMP:
 		{
-
+			sscanf(token_str, "%d", &result->timestamp);
 		}
 			break;
+
+		case VALID:
+		{
+			if (strcmp(token_str, "A") != 0)
+			{
+				retVal = 1;
+			}
+		}
+			break;
+
+		case LAT:
+		{
+			double lat;
+			if (sscanf(token_str, "%lf", &lat) != 1)
+			{
+				retVal = 1;
+			}
+			else
+			{
+				result->location.lat_deg = (int) (lat / 100.0f + 0.5f);
+				result->location.lat_min = (float) (lat - 100.0 * result->location.lat_deg);
+			}
+		}
+			break;
+
+		case LAT_D:
+		{
+			if (token_str[0] == 'N' || token_str[0] == 'S')
+			{
+				if (token_str[0] == 'S')
+				{
+					result->location.lat_deg *= -1;
+				}
+			}
+			else
+			{
+				retVal = 1;
+			}
+		}
+			break;
+
+		case LON:
+		{
+			double lon;
+			if (sscanf(token_str, "%lf", &lon) != 1)
+			{
+				retVal = 1;
+			}
+			else
+			{
+				result->location.lon_deg = (int) (lon / 100.0f + 0.5f);
+				result->location.lon_min = (float) (lon - 100.0 * result->location.lon_deg);
+			}
+		}
+			break;
+
+		case LON_D:
+		{
+			if (token_str[0] == 'E' || token_str[0] == 'W')
+			{
+				if (token_str[0] == 'W')
+				{
+					result->location.lon_deg *= -1;
+				}
+			}
+			else
+			{
+				retVal = 1;
+			}
+		}
+			break;
+
+		case SPEED:
+		{
+			if (sscanf(token_str, "%f", &result->speed) != 1)
+				retVal = 1;
+		}
+		break;
+
+		case DATE:
+		{
+			if (sscanf(token_str, "%u", &result->date) != 1)
+							retVal = 1;
+		}
+		break;
 
 		default:
 			break;
 		}
 
-		if (retVal) break;
+		if (retVal)
+			break;
 	}
 
-	result->isValid = 1;
+	if (checkSum(message) != 0)
+	{
+		retVal = 2;
+	}
+
+	if (retVal == 0)
+	{
+		result->isValid = 1;
+	}
+
 	return retVal;
 }
