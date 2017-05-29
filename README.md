@@ -12,10 +12,10 @@ Note: this repo doesn't support Arduino IDE. Everything must be run from Makefil
         |       +---ChibiOS/                    - 
         +---c-project/                          - skeleton  for C based projects using avr-gcc
         |       +---with-os/                    -
-        |	+---without-os/                 -
+        |       +---without-os/                 -
         +---cpp-project/                        - skeleton  for C++ based projects using avr-g++
-        |	+---with-os/                    -
-        |	+---without-os/                 -
+        |       +---with-os/                    -
+        |       +---without-os/                 -
         +---doc                                 - documentations
         +---common/                             - includes common/unit test makefiles for all projects
         |       +---utils/                      - common protocols such as soft serial, i2c, debugging
@@ -26,7 +26,7 @@ Note: this repo doesn't support Arduino IDE. Everything must be run from Makefil
 
 # Usage
         go to c*-project/with*-os/ directory and use its makefile
-        go to test/ to checkout individual module test code, all code here must be in C
+        go to test/ to checkout individual module test code, all code here must be in C except cxxtest headers
 	
 # Question & Bug fix?
 	Please email author tdpham1105@yahoo.com

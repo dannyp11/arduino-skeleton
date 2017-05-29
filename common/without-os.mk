@@ -14,6 +14,11 @@ OS_DIR     = $(TOP)/os/ChibiOS/
 CC ?=avr-gcc
 BINARY_NAME ?=main.elf
 
+ifneq ($(filter $(UTILS_SUPPORT), 1 yes YES),) # check if UTILS_SUPPORT is 1|yes|YES
+SOURCES	  += $(wildcard $(TOP)/common/utils/*.c)
+INCLUDES  += $(TOP)/common/utils/ 
+endif
+
 OBJECTS	 = $(patsubst %.cpp, %.o, $(SOURCES))
 OBJECTS	 += $(patsubst %.c, %.o, $(SOURCES))
 OBJECTS  := $(filter-out %.c, $(OBJECTS))
@@ -21,7 +26,10 @@ OBJECTS  := $(filter-out %.cpp, $(OBJECTS))
 
 IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
 CFLAGS  += -Wall -Os 
+
+ifneq ($(filter $(FLOAT_SUPPORT), 1 yes YES),) # check if FLOAT_SUPPORT is 1|yes|YES
 CFLAGS  += -Wl,-u,vfprintf -lprintf_flt -Wl,-u,vfscanf -lscanf_flt -lm # printf scanf float support
+endif
 
 # Fuse Low Byte = 0xe0   Fuse High Byte = 0xd9   Fuse Extended Byte = 0xff
 # Bit 7: CKDIV8  = 0     Bit 7: RSTDISBL  = 1    Bit 7:
@@ -47,7 +55,8 @@ COMPILE = $(CC) $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(IFLAGS)
 # symbolic targets:
 .default: all
 
-all:	main.hex
+all:	clean
+	$(MAKE) main.hex
 	
 	
 .c.o:
