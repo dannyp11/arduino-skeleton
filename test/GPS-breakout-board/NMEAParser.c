@@ -399,12 +399,35 @@ float NMEAGetDistance(const NMEALocation * a, const NMEALocation * b)
 	float lonb = toRadian(b->lon_deg, b->lon_min);
 
 	float R = 6378.0f;
-	float dlat = fabs(lata - latb);
-	float dlon = fabs(lona - lonb);
+	float dlat = (latb - lata);
+	float dlon = (lonb - lona);
 
 	float fa = sin(dlat/2) * sin(dlat/2) + cos(lata) * cos(latb) * sin (dlon/2) * sin(dlon/2);
 	float fc = 2 * atan2(sqrt(fa), sqrt(1-fa));
 	retVal = fc * R;
 
+	return retVal;
+}
+
+float NMEAGetAngle(const NMEALocation * a, const NMEALocation * b)
+{
+	float retVal = -1;
+
+	float lata = toRadian(a->lat_deg, a->lat_min);
+	float lona = toRadian(a->lon_deg, a->lon_min);
+	float latb = toRadian(b->lat_deg, b->lat_min);
+	float lonb = toRadian(b->lon_deg, b->lon_min);
+
+	float dlat = (latb - lata);
+	float dlon = (lonb - lona);
+
+	float y = sin(dlon) * cos(latb);
+	float x = cos(lata) * sin(latb) - sin(lata) * cos(latb) * cos(dlon);
+	float bearing = atan2(y, x);
+
+	bearing = bearing * 180.0 / M_PI;
+	bearing *= -1;
+
+	retVal = bearing;
 	return retVal;
 }

@@ -53,4 +53,14 @@ uint8_t NMEAParserParseString(const char * message, NMEAData * result);
  */
 float NMEAGetDistance(const NMEALocation * a, const NMEALocation * b);
 
+/**
+ * Get angle in degree compared to North CCW
+ *
+ * @param a
+ * @param b
+ * @return angle
+ * 			-1 on fail
+ */
+float NMEAGetAngle(const NMEALocation * a, const NMEALocation * b);
+
 #endif /* TEST_GPS_BREAKOUT_BOARD_NMEAPARSER_H_ */
