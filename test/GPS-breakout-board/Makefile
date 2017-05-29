@@ -2,13 +2,14 @@
 CC=avr-gcc
 CFLAGS = 
 TOP = ../../
+FLOAT_SUPPORT = YES # support printf, sscanf floats
 
 # required
 SOURCES = $(wildcard *.c)
 INCLUDES = ./
 
-#unit test files
-TEST_HEADERS = $(wildcard test/*.h) 
+# unit test files
+# remember to put cxx test headers in test/*Test.h
 TEST_SOURCES = NMEAParser.c
 
 # extra utils such as soft serial, i2c, serial debug
