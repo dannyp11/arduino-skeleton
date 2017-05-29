@@ -1,6 +1,6 @@
 # to program to arduino, type make flash
 CC=avr-gcc
-CFLAGS =
+CFLAGS = 
 TOP = ../../
 
 # required

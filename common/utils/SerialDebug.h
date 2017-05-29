@@ -9,6 +9,25 @@
 #define SERIALDEBUG_H_
 
 #include <stdio.h>
+#include <string.h>
+
+#ifndef CXXTEST
+#define LOG(msg, arg...) \
+	{ char __msg[128]; \
+	snprintf(__msg, 128, msg, ##arg);\
+	SerialDebugPrint("%s:%d - %s", __FILE__, __LINE__, __msg); \
+	}
+#else
+#define LOG(msg, arg...) \
+	{ char __msg[128]; \
+	sprintf(__msg, msg, ##arg);\
+	printf("%s:%d - %s \n", __FILE__, __LINE__, __msg); \
+	}
+#endif
+
+#define TRACE() LOG(" ");
+#define TRACE_INT(var) LOG("[%s] = %d", #var, var);
+#define TRACE_STRING(var) LOG("[%s] = %s", #var, var);
 
 /*
  * Init serial port

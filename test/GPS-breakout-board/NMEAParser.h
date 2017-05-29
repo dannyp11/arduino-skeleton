@@ -19,8 +19,8 @@ typedef struct _NMEALocation
 typedef struct _NMEAData
 {
 	NMEALocation location;
-	uint32_t timestamp; // military time hhmmss
-	uint32_t date; // format ddmmyy
+	int timestamp; // military time hhmmss
+	unsigned date; // format ddmmyy
 	float speed; // in knot
 	uint8_t isValid;
 } NMEAData;
@@ -29,15 +29,28 @@ typedef struct _NMEAData
 /**
  * Parse message and put data in result
  *
- * Log:		supporting GPRMC
+ * Log:		supported GPRMC, GPGGA
+ *
+ * WIP:
  *
  *
- * @param message - NMEA msg to be parsed
+ * @param message - NMEA msg to be parsed, example "$GPRMC,192826.000,A,4448.9261,N,09337.4366,W,0.02,123.77,270517,,,D*72"
  * @param result - pointer to result data
  * @return 	0 on success
  * 			1 on format error
  * 			2 on checksum error
+ * 			3 unsupported message
  */
 uint8_t NMEAParserParseString(const char * message, NMEAData * result);
+
+/**
+ * Get distance in kilometers between  a and b
+ *
+ * @param a
+ * @param b
+ * @return 	distance on success
+ * 			-1 on fail
+ */
+float NMEAGetDistance(const NMEALocation * a, const NMEALocation * b);
 
 #endif /* TEST_GPS_BREAKOUT_BOARD_NMEAPARSER_H_ */

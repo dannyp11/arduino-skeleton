@@ -20,7 +20,8 @@ OBJECTS  := $(filter-out %.c, $(OBJECTS))
 OBJECTS  := $(filter-out %.cpp, $(OBJECTS))
 
 IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
-CFLAGS  += -Wall -Os
+CFLAGS  += -Wall -Os 
+CFLAGS  += -Wl,-u,vfprintf -lprintf_flt -Wl,-u,vfscanf -lscanf_flt -lm # printf scanf float support
 
 # Fuse Low Byte = 0xe0   Fuse High Byte = 0xd9   Fuse Extended Byte = 0xff
 # Bit 7: CKDIV8  = 0     Bit 7: RSTDISBL  = 1    Bit 7:

@@ -4,7 +4,7 @@
 TEST_SOURCES ?=
 TEST_HEADERS ?=
 TEST_CC =g++
-CFLAGS = -g -O0
+TEST_CFLAGS = -g -O0 -DCXXTEST=1
 IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
 
 # test objects definition
@@ -28,13 +28,13 @@ check: test_gen
 	$(MAKE) testclean > /dev/null
 
 TEST_COMPILE: $(TEST_OBJECTS) $(TEST_BIN_OBJS)
-	$(foreach bin, $(TEST_BINARIES), $(TEST_CC) $(CFLAGS) $(IFLAGS) $(TEST_OBJECTS) $(bin) -o $(bin).test ;)
+	$(foreach bin, $(TEST_BINARIES), $(TEST_CC) $(TEST_CFLAGS) $(IFLAGS) $(TEST_OBJECTS) $(bin) -o $(bin).test ;)
 
 %.ocxx: %.c
-	$(TEST_CC) -c $(CFLAGS) $(IFLAGS) -o $@ $<
+	$(TEST_CC) -c $(TEST_CFLAGS) $(IFLAGS) -o $@ $<
 
 test/%.ocxx: test/%.h.cpp
-	$(TEST_CC) -c $(CFLAGS) $(IFLAGS) -o $@ $<
+	$(TEST_CC) -c $(TEST_CFLAGS) $(IFLAGS) -o $@ $<
 
 testclean:
 	rm -f $(addsuffix .cpp, $(TEST_HEADERS))

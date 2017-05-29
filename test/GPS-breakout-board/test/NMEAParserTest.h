@@ -83,6 +83,7 @@ public:
 	{
 		const string input1 =
 				"$GPGGA,191904.000,4448.9275,N,09337.4358,W,1,04,1.83,300.7,M,-31.4,M,,*5A";
+		const string input2 = "$GPGGA,022159.000,4448.9309,N,09337.4322,W,2,06,1.86,289.1,M,-31.4,M,0000,0000*56";
 
 		NMEAData data1, data2; // expected data
 		NMEAData actual1, actual2;
@@ -91,10 +92,25 @@ public:
 		data1.isValid = 1;
 		data1.location.lat_deg = 44;
 		data1.location.lat_min = 48.9275;
-		data1.location.lon_deg = - 93;
+		data1.location.lon_deg = -93;
 		data1.location.lon_min = 37.4358;
 
 		TS_ASSERT_EQUALS(NMEAParserParseString(input1.c_str(), &actual1), 0);
+		TS_ASSERT_EQUALS(NMEAParserParseString(input2.c_str(), &actual2), 0);
+
+		confirmData(data1, actual1);
+	}
+
+	void testGGAFail()
+	{
+		const string input1 =
+				"$GPGGA,191901.000,4448.9275,N,09337.4358,W,1,04,1.83,300.7,M,-31.4,M,,*5A";
+		const string input2 = "$GPGGA,235951.800,,,,,0,00,,,M,,M,,*79";
+
+		NMEAData actual1, actual2;
+
+		TS_ASSERT_EQUALS(NMEAParserParseString(input1.c_str(), &actual1), 2);
+		TS_ASSERT_EQUALS(NMEAParserParseString(input2.c_str(), &actual2), 1);
 	}
 };
 
