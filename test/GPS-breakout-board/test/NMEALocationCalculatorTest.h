@@ -44,7 +44,7 @@ public:
 		location2.lon_deg = 33;
 		location2.lon_min = 44.1;
 
-		TS_ASSERT_DELTA(NMEAGetDistance(&location1, &location2), 0.0019, 0.0001);
+		TS_ASSERT_DELTA(NMEAGetDistance(&location1, &location2), 1.9, 0.1);
 	}
 
 	void testAngleSuccess()

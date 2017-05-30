@@ -188,6 +188,6 @@ void LCDReset()
 	LCDSendCommand(CURSORHOME);
 	LCDSendCommand(CURSOROFF);
 	LCDSetContrast(48);
-	LCDSetBrightness(8);
+	LCDSetBrightness(2);
 }
 // End LCD APIs -------------------------------------------------------------

@@ -13,8 +13,9 @@ OS_DIR     = $(TOP)/os/ChibiOS/
 ###########################################################################
 CC ?=avr-gcc
 BINARY_NAME ?=main.elf
+TRUE = 1 yes YES true TRUE
 
-ifneq ($(filter $(UTILS_SUPPORT), 1 yes YES),) # check if UTILS_SUPPORT is 1|yes|YES
+ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),) # check if UTILS_SUPPORT is 1|yes|YES
 SOURCES	  += $(wildcard $(TOP)/common/utils/*.c)
 INCLUDES  += $(TOP)/common/utils/ 
 endif
@@ -27,7 +28,11 @@ OBJECTS  := $(filter-out %.cpp, $(OBJECTS))
 IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
 CFLAGS  += -Wall -Os 
 
-ifneq ($(filter $(FLOAT_SUPPORT), 1 yes YES),) # check if FLOAT_SUPPORT is 1|yes|YES
+ifneq ($(filter $(DEBUG), $(TRUE)),) # check if -DDEBUG should be added
+CFLAGS  += -DDEBUG=1
+endif
+
+ifneq ($(filter $(FLOAT_SUPPORT), $(TRUE)),) # check if FLOAT_SUPPORT is 1|yes|YES
 CFLAGS  += -Wl,-u,vfprintf -lprintf_flt -Wl,-u,vfscanf -lscanf_flt -lm # printf scanf float support
 endif
 

@@ -398,7 +398,7 @@ float NMEAGetDistance(const NMEALocation * a, const NMEALocation * b)
 	float latb = toRadian(b->lat_deg, b->lat_min);
 	float lonb = toRadian(b->lon_deg, b->lon_min);
 
-	float R = 6378.0f;
+	float R = 6371000.0f;
 	float dlat = (latb - lata);
 	float dlon = (lonb - lona);
 

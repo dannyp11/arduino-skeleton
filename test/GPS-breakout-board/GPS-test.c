@@ -7,15 +7,17 @@
 
 #include "NMEAParser.h"
 #include "SerialDebug.h"
+#include "../LCD-4x20/LCD.h"
 
 #include <util/delay.h>
 #include <string.h>
 
 int main(void)
 {
+	LCDInit();
 	SerialDebugInit();
 	float distance = 0.0f;
-	NMEAData initLocation;
+	NMEAData initLocation, prevData;
 	initLocation.isValid = 0;
 
 	// get init location
@@ -28,6 +30,8 @@ int main(void)
 
 		NMEAParserParseString(gps_msg, &initLocation);
 	}
+
+	prevData = initLocation;
 
 	while (1)
 	{
@@ -47,10 +51,20 @@ int main(void)
 			SerialDebugPrint("lon %d %f", gpsData.location.lon_deg,
 					gpsData.location.lon_min);
 
-			distance += NMEAGetDistance(&initLocation.location, &gpsData.location);
-			SerialDebugPrint("traveled distance %f", distance);
+			distance += NMEAGetDistance(&prevData.location, &gpsData.location);
+			SerialDebugPrint("traveled distance %.2f m", distance);
+
+			float angle = NMEAGetAngle(&initLocation.location, &gpsData.location);
+			SerialDebugPrint("angle from initial location %.2f degrees", angle);
 
 			SerialDebugPrint(" ");
+
+			LCDSetCursor(1,0);
+			LCDPrint("traveled %.2f m", distance);
+			LCDSetCursor(2,0);
+			LCDPrint("angle %.2f degrees", angle);
+
+			prevData = gpsData;
 		}
 
 		_delay_ms(100);

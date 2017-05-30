@@ -44,7 +44,7 @@ typedef struct _NMEAData
 uint8_t NMEAParserParseString(const char * message, NMEAData * result);
 
 /**
- * Get distance in kilometers between  a and b
+ * Get distance in meters between  a and b
  *
  * @param a
  * @param b

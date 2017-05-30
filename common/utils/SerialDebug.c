@@ -17,8 +17,7 @@
  */
 char SerialDebugGetChar()
 {
-	while (!( UCSR0A & (1 << RXC0)))
-		;
+	loop_until_bit_is_set(UCSR0A, RXC0); /* Wait until data exists. */
 	return UDR0;
 }
 
@@ -27,8 +26,7 @@ char SerialDebugGetChar()
  */
 void sci_out(char ch)
 {
-	while ((UCSR0A & (1 << UDRE0)) == 0)
-		;
+	loop_until_bit_is_set(UCSR0A, UDRE0); /* Wait until data register empty. */
 	UDR0 = ch;
 }
 
@@ -51,8 +49,8 @@ void SerialDebugInit()
 	UBRR0 = MYUBRR;          // Set baud rate
 	UCSR0B |= (1 << TXEN0);  // Turn on transmitter
 	UCSR0B |= (1 << RXEN0); // Turn on receiver
-	UCSR0C = (3 << UCSZ00);  // Set for asynchronous operation, no parity,
-							 // one stop bit, 8 data bits
+	UCSR0A &= ~(_BV(U2X0));
+	UCSR0C = _BV(UCSZ01) | _BV(UCSZ00); /* 8-bit data */
 
 	SerialDebugPrint("Serial Debug activated");
 	SerialDebugPrint("Compiled on : %s %s", __DATE__, __TIME__);

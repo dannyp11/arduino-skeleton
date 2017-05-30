@@ -10,6 +10,8 @@
 #include <util/delay.h>
 #include <compat/twi.h>
 
+#include "SerialDebug.h"
+
 /*
  i2c_io - write and read bytes to a slave I2C device
 
@@ -69,10 +71,17 @@
  i2c_io(0xD0, abuf, 1, NULL, 0, rbuf, 20);
  */
 
-uint8_t i2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an, uint8_t *wp,
+uint8_t i2c_io(uint8_t device_addr, const uint8_t *ap, uint16_t an, const uint8_t *wp,
 		uint16_t wn, uint8_t *rp, uint16_t rn, uint8_t delayEveryByte) {
 	uint8_t status, send_stop;
 	uint8_t wrote, start_stat;
+
+	LOG("sending to %x %d bytes: ", device_addr>>1, an);
+	uint16_t i;
+	for (i = 0; i < an; ++i)
+	{
+		LOG("  %x", ap[i]);
+	}
 
 	status = 0;
 	wrote = 0;
@@ -232,7 +241,7 @@ void I2CInit(void) {
 	_i2cIsRunning = 0;
 }
 
-uint8_t I2CSendData(uint8_t address, uint8_t * data, uint8_t datalen, uint8_t isSlowTX) {
+uint8_t I2CSendData(uint8_t address, const uint8_t * data, uint8_t datalen, uint8_t isSlowTX) {
 	if (_i2cIsRunning) return 1;
 
 	_i2cIsRunning = 1;
@@ -242,7 +251,7 @@ uint8_t I2CSendData(uint8_t address, uint8_t * data, uint8_t datalen, uint8_t is
 	return result;
 }
 
-uint8_t I2CSendnRecvData(uint8_t address, uint8_t * txdata, uint8_t txdatalen,
+uint8_t I2CSendnRecvData(uint8_t address, const uint8_t * txdata, uint8_t txdatalen,
 		uint8_t * rxdata, uint8_t rxdatalen, uint8_t isSlowTX) {
 	if (_i2cIsRunning) return 1;
 

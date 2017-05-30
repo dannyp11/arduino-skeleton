@@ -3,9 +3,14 @@
 
 TEST_SOURCES ?=
 TEST_HEADERS ?= $(wildcard test/*Test.h) 
-TEST_CC =g++
+TEST_CC =clang++
 TEST_CFLAGS = -g -O0 -DCXXTEST=1
 IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
+
+TRUE = 1 yes YES true TRUE
+ifneq ($(filter $(TEST_DEBUG), $(TRUE)),) # check if -DDEBUG should be added
+TEST_CFLAGS  += -DDEBUG=1
+endif
 
 # test objects definition
 TEST_OBJECTS	= $(patsubst %.cpp, %.ocxx, $(TEST_SOURCES))

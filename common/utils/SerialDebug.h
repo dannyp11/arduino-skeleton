@@ -11,11 +11,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "MemoryFree.h"
+
+#ifdef DEBUG
 #ifndef CXXTEST
+char __msg[128];
 #define LOG(msg, arg...) \
-	{ char __msg[128]; \
+	{  \
 	snprintf(__msg, 128, msg, ##arg);\
-	SerialDebugPrint("%s:%d - %s", __FILE__, __LINE__, __msg); \
+	SerialDebugPrint("%s:%d - (%d) %s", __FILE__, __LINE__, freeMemory(), __msg); \
 	}
 #else
 #define LOG(msg, arg...) \
@@ -23,6 +27,9 @@
 	sprintf(__msg, msg, ##arg);\
 	printf("%s:%d - %s \n", __FILE__, __LINE__, __msg); \
 	}
+#endif
+#else
+#define LOG(...) ;
 #endif
 
 #define TRACE() LOG(" ");
@@ -37,8 +44,9 @@ void SerialDebugInit(void);
 /*
  * Printf to serial port
  */
+char _msg[128];
 #define SerialDebugPrint(arg...) \
-{ 	char _msg[128];\
+{ 	\
 	snprintf(_msg, 128, ##arg); \
 	_SerialDebugPrint1(_msg); \
 }
