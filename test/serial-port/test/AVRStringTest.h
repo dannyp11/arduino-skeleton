@@ -23,10 +23,10 @@ public:
 	{
 		char input1[] = "hello\b\b\b\bi world";
 		char input2[] = "Danny\b\b\bt";
-		char input3[] = "hi\bo";
+		char input3[] = "hi\b\blo";
 
 		AVRStringRefineString(input3);
-		TS_ASSERT_SAME_DATA(input3, "ho", strlen(input3));
+		TS_ASSERT_SAME_DATA(input3, "lo", strlen(input3));
 
 		AVRStringRefineString(input1);
 		TS_ASSERT_SAME_DATA(input1, "hi world", strlen("hi world"));
