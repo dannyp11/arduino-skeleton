@@ -8,3 +8,5 @@ function cleanFolder()
 }
 
 cleanFolder test/
+cleanFolder c-project/
+

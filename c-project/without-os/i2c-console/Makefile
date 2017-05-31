@@ -6,7 +6,7 @@ FLOAT_SUPPORT = no # support printf, sscanf floats
 UTILS_SUPPORT = YES # extra utils such as soft serial, i2c, serial debug
 
 # required
-TOP = ../../
+TOP = ../../../
 SOURCES = $(wildcard *.c)
 INCLUDES = ./
 

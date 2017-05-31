@@ -135,8 +135,6 @@ void testLCD()
 	processMessage(input3);
 	processMessage(input4);
 	processMessage(input5);
-
-	TRACE()
 }
 
 void testCompass()
