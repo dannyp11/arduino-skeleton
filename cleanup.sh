@@ -8,5 +8,5 @@ function cleanFolder()
 }
 
 cleanFolder test/
-cleanFolder c-project/
+cleanFolder c-project/without-os/
 

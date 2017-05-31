@@ -12,6 +12,7 @@
 #include "SerialDebug.h"
 
 static uint8_t _i2c_address;
+static uint8_t _i2c_slowTx;
 
 /**
  * internal - process and parse array of hex numbers to result
@@ -144,6 +145,23 @@ uint8_t processAddr(const char * message, I2CConsoleMessage * result,
 	return errcode;
 }
 
+uint8_t processSlow(const char * message, I2CConsoleMessage * result,
+		uint8_t errcode)
+{
+	if (errcode)
+		return errcode;
+
+	// set address
+	result->command = SET_SLOW;
+	if (sscanf(message + 5, "%u", &result->isDelayBetweenBytes) != 1)
+	{
+		TRACE()
+		errcode = 1;
+	}
+
+	return errcode;
+}
+
 uint8_t processTX(const char * message, I2CConsoleMessage * result,
 		uint8_t errcode)
 {
@@ -189,8 +207,8 @@ uint8_t processRX(const char * message, I2CConsoleMessage * result,
 				{
 					// parse tx part
 					errcode = processTXPart(
-							(char*) message + strlen("RX ") + strlen(token)
-									+ 1, result, errcode);
+							(char*) message + strlen("RX ") + strlen(token) + 1,
+							result, errcode);
 
 					break;
 				}
@@ -220,6 +238,7 @@ uint8_t I2CConsoleParser(const char * message, I2CConsoleMessage * result)
 	result->isValid = 0;
 	result->rx_len = 0;
 	result->tx_len = 0;
+	result->isDelayBetweenBytes = 1;
 	result->message[0] = '\0';
 
 	char command[10];
@@ -233,6 +252,11 @@ uint8_t I2CConsoleParser(const char * message, I2CConsoleMessage * result)
 	{
 		// set address
 		retVal = processAddr(message, result, retVal);
+	}
+	else if (strcasecmp(command, "SLOW") == 0)
+	{
+		// set wait between bytes send
+		retVal = processSlow(message, result, retVal);
 	}
 	else if (strcasecmp(command, "TX") == 0)
 	{
@@ -259,6 +283,7 @@ void I2CConsoleDumpCommand(const I2CConsoleMessage * command)
 {
 	LOG("========================================================");
 	LOG("address %x", command->address);
+	TRACE_INT(command->isDelayBetweenBytes);
 	TRACE_INT(command->isValid);
 	TRACE_INT(command->rx_len);
 	TRACE_INT(command->tx_len);
@@ -292,15 +317,21 @@ void I2CConsoleDumpCommand(const I2CConsoleMessage * command)
 #include "I2C.h"
 #include <util/delay.h>
 
-uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command)
+static void consoleInit()
 {
 	static uint8_t isInited = 0;
 	if (!isInited)
 	{
 		I2CInit();
 		_i2c_address = 0x00;
+		_i2c_slowTx = 1;
 		isInited = 1;
 	}
+}
+
+uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command)
+{
+	consoleInit();
 
 	uint8_t retVal = (command->isValid) ? 0 : 2;
 
@@ -333,6 +364,15 @@ uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command)
 			}
 		}
 
+		if (command->command == SET_SLOW)
+		{
+			_i2c_slowTx = (command->isDelayBetweenBytes) ? 1 : 0;
+		}
+		else
+		{
+			command->isDelayBetweenBytes = _i2c_slowTx;
+		}
+
 		if (_i2c_address != 0x00)
 		{
 			if (command->command == SEND)
@@ -340,13 +380,13 @@ uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command)
 				if (command->tx_len)
 				{
 					retVal += I2CSendData(_i2c_address, data, command->tx_len,
-							1);
+							_i2c_slowTx);
 				}
 
 				else if (command->message)
 				{
 					retVal += I2CSendData(_i2c_address, data,
-							strlen(command->message), 1);
+							strlen(command->message), _i2c_slowTx);
 				}
 			}
 			else if (command->command == SENDNRECV)
@@ -355,14 +395,15 @@ uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command)
 				if (command->tx_len)
 				{
 					retVal += I2CSendnRecvData(_i2c_address, data,
-							command->tx_len, command->rx, command->rx_len, 1);
+							command->tx_len, command->rx, command->rx_len,
+							_i2c_slowTx);
 				}
 
 				else if (command->message)
 				{
 					retVal += I2CSendnRecvData(_i2c_address, data,
 							strlen(command->message), command->rx,
-							command->rx_len, 1);
+							command->rx_len, _i2c_slowTx);
 				}
 			}
 		}
@@ -372,22 +413,22 @@ uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command)
 		}
 	}
 
-	if (!retVal) _delay_ms(150);
+	if (!retVal)
+		_delay_ms(150);
 
 	return retVal;
 }
 
 uint8_t I2CConsoleGetCurrentAddress()
 {
-	static uint8_t isInited = 0;
-	if (!isInited)
-	{
-		I2CInit();
-		_i2c_address = 0x00;
-		isInited = 1;
-	}
-
+	consoleInit();
 	return _i2c_address;
+}
+
+uint8_t I2CConsoleGetSlowSendingStatus()
+{
+	consoleInit();
+	return _i2c_slowTx;
 }
 
 #endif

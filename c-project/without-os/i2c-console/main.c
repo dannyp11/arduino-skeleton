@@ -21,8 +21,11 @@ const char PROGMEM help3[] = "TX 2 00 03         - send 2 bytes 0x00 and 0x03";
 const char PROGMEM help0[] = "TX \"hello world\" - send string \"hello world\"";
 const char PROGMEM help4[] =
 		"RX 6 2 ab 03       - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx";
-const char PROGMEM helploop1[] = "LOOP 2 TX 2 00 03     - loop the command 'TX 2 00 03' for 2 seconds";
-const char PROGMEM helploop2[] = "LOOP 5 RX 6 1 ab     - loop the command 'RX 6 1 ab' for 5 seconds";
+const char PROGMEM help41[] = "SLOW 0			 - set slow sending off";
+const char PROGMEM helploop1[] =
+		"LOOP 2 TX 2 00 03     - loop the command 'TX 2 00 03' for 2 seconds";
+const char PROGMEM helploop2[] =
+		"LOOP 5 RX 6 1 ab     - loop the command 'RX 6 1 ab' for 5 seconds";
 const char PROGMEM help5[] = "---------------";
 const char PROGMEM help6[] = "testlcd            - test the lcd 4x20";
 const char PROGMEM help7[] = "testcompass        - test the GY-85 module";
@@ -51,6 +54,9 @@ void showHelp()
 	SerialDebugPrint(msg);
 
 	PgmStorageGet(msg, help4);
+	SerialDebugPrint(msg);
+
+	PgmStorageGet(msg, help41);
 	SerialDebugPrint(msg);
 
 	PgmStorageGet(msg, helploop1);
@@ -125,12 +131,14 @@ void processMessage(const char * message)
 void testLCD()
 {
 	const char input1[] = "addr 28";
+	const char input0[] = "slow 1";
 	const char input2[] = "tx 2 fe a3";
 	const char input3[] = "tx 2 fe 4b";
 	const char input4[] = "tx 2 fe 51";
 	const char input5[] = "tx \"hello world\"";
 
 	processMessage(input1);
+	processMessage(input0);
 	processMessage(input2);
 	processMessage(input3);
 	processMessage(input4);
@@ -140,11 +148,13 @@ void testLCD()
 void testCompass()
 {
 	const char input1[] = "addr 1e";
+	const char input0[] = "slow 0";
 	const char input2[] = "tx 2 2 0";
 	const char input3[] = "tx 2 0 90";
 	const char input4[] = "rx 6 1 3";
 
 	processMessage(input1);
+	processMessage(input0);
 	processMessage(input2);
 	processMessage(input3);
 	processMessage(input4);
@@ -169,13 +179,17 @@ void loopCommand(const char * message)
 			else
 			{
 				// found loop time
-				SerialDebugPrint("looping %d seconds for '%s'", loop_time, message + strlen("loop ") + strlen(token) + 1);
+				SerialDebugPrint("looping %d seconds for '%s'", loop_time,
+						message + strlen("loop ") + strlen(token) + 1);
 
-				TRACE();
-				uint8_t initSec = mMillis/1000;
-				while ((uint8_t)(mMillis / 1000) - initSec <= (uint8_t) loop_time)
+				TRACE()
+				;
+				uint8_t initSec = mMillis / 1000;
+				while ((uint8_t) (mMillis / 1000) - initSec
+						<= (uint8_t) loop_time)
 				{
-					processMessage(message + strlen("loop ") + strlen(token) + 1);
+					processMessage(
+							message + strlen("loop ") + strlen(token) + 1);
 				}
 			}
 
@@ -206,11 +220,11 @@ int main()
 
 		SerialDebugPrint(" ");
 		SerialDebugPrint(
-				"Enter i2c command or type help (current address 0x%x)",
-				I2CConsoleGetCurrentAddress());
+				"Enter i2c command or type help (current address 0x%x, slow status %u)",
+				I2CConsoleGetCurrentAddress(), I2CConsoleGetSlowSendingStatus());
 		SerialDebugGetLine(buffer, 1);
 		uint8_t i = 0;
-		while(buffer[i] != '\0' && buffer[i] != ' ')
+		while (buffer[i] != '\0' && buffer[i] != ' ')
 		{
 			firstWord[i] = buffer[i];
 			++i;

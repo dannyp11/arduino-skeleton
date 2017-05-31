@@ -15,3 +15,4 @@
 * RX 6 2 ab 03                  - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx
 * LOOP 3 TX "hello world"       - loop in 3 seconds for sending TX "hello world"
 * LOOP 5 RX 6 2 ab 03           - loop in 5 seconds for sending RX 6 2 ab 03
+* SLOW 0                        - set slow sending off

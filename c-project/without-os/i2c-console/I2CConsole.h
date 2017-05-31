@@ -16,13 +16,15 @@ typedef enum _i2ccommand
 {
 	SEND = 0,
 	SENDNRECV,
-	SET_ADDRESS
+	SET_ADDRESS,
+	SET_SLOW
 } I2CConsoleCommand;
 
 typedef struct _i2cMessage
 {
 	I2CConsoleCommand command;
 	uint8_t isValid;
+	unsigned isDelayBetweenBytes;
 	int tx_len, rx_len;
 	unsigned tx[10];
 	uint8_t rx[10];
@@ -41,6 +43,7 @@ typedef struct _i2cMessage
  * RX 6 2 ab 03 	- send 2 bytes 0xab and 0x03, receive 6 bytes back to rx
  * LOOP 3 TX "hello world" - loop in 3 seconds for sending TX "hello world"
  * LOOP 5 RX 6 2 ab 03 	- loop in 5 seconds for sending RX 6 2 ab 03
+ * SLOW 0			 - set slow sending off
  *
  * @param message
  * @param result
@@ -75,5 +78,12 @@ void I2CConsoleDumpCommand(const I2CConsoleMessage * command);
  * @return - 7-bit address
  */
 uint8_t I2CConsoleGetCurrentAddress();
+
+/**
+ * get current setting of slow sending
+ *
+ * @return - 1 on 0 off
+ */
+uint8_t I2CConsoleGetSlowSendingStatus();
 
 #endif /* TEST_I2C_CONSOLE_I2CCONSOLE_H_ */
