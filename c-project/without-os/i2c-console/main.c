@@ -14,21 +14,21 @@
 
 const char PROGMEM helpaddr1[] = "Hint address: LCD 0x28, compass 0x19";
 const char PROGMEM help1[] =
-		"Sample command     - explanation (command case insensitive)";
+		"Sample command \t\t - explanation (command case insensitive)";
 const char PROGMEM help2[] =
-		"ADDR 28            - set i2c 7-bit address as 0x28";
-const char PROGMEM help3[] = "TX 2 00 03         - send 2 bytes 0x00 and 0x03";
-const char PROGMEM help0[] = "TX \"hello world\" - send string \"hello world\"";
+		"ADDR 28 \t\t - set i2c 7-bit address as 0x28";
+const char PROGMEM help3[] = "TX 2 00 03 \t\t - send 2 bytes 0x00 and 0x03";
+const char PROGMEM help0[] = "TX \"hello world\" \t - send string \"hello world\"";
 const char PROGMEM help4[] =
-		"RX 6 2 ab 03       - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx";
-const char PROGMEM help41[] = "SLOW 0			 - set slow sending off";
+		"RX 6 2 ab 03 \t\t - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx";
+const char PROGMEM help41[] = "SLOW 0 \t\t\t - set slow sending off";
 const char PROGMEM helploop1[] =
-		"LOOP 2 TX 2 00 03     - loop the command 'TX 2 00 03' for 2 seconds";
+		"LOOP 2 TX 2 00 03 \t - loop the command 'TX 2 00 03' for 2 seconds";
 const char PROGMEM helploop2[] =
-		"LOOP 5 RX 6 1 ab     - loop the command 'RX 6 1 ab' for 5 seconds";
+		"LOOP 5 RX 6 1 ab \t - loop the command 'RX 6 1 ab' for 5 seconds";
 const char PROGMEM help5[] = "---------------";
-const char PROGMEM help6[] = "testlcd            - test the lcd 4x20";
-const char PROGMEM help7[] = "testcompass        - test the GY-85 module";
+const char PROGMEM help6[] = "testlcd \t\t - test the lcd 4x20";
+const char PROGMEM help7[] = "testcompass \t\t - test the GY-85 module";
 const char PROGMEM help8[] =
 		"========================================================================";
 

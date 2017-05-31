@@ -85,12 +85,18 @@ void SerialDebugGetLine(char* buffer, char echo)
 		if (echo)
 		{
 			sci_out(buffer[i]); // echo
+
+			if (buffer[i] == '\b')
+			{
+				sci_outs(" \b");
+			}
 		}
 		if (buffer[i] == '\n' || buffer[i] == '\r')
 			break;
 		++i;
 	}
 	buffer[i] = '\0';
+	if (buffer[0] == '\b') buffer[0] = 0x02; // \b at start of string
 
 	// refine buffer for backspace support
 	AVRStringRefineString(buffer);

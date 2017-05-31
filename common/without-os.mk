@@ -106,7 +106,7 @@ $(BINARY_NAME): $(OBJECTS)
 main.hex: $(BINARY_NAME)
 	rm -f main.hex
 	avr-objcopy -j .text -j .data -O ihex $(BINARY_NAME) main.hex
-	avr-size $(BINARY_NAME)
+	avr-size -C $(BINARY_NAME)
 # If you have an EEPROM section, you must also create a hex file for the
 # EEPROM and add it to the "flash" target.
 
