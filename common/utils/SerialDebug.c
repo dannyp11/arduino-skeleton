@@ -50,7 +50,7 @@ void SerialDebugInit()
 
 void SerialDebugInitWithBaudRate(unsigned baudrate)
 {
-	UBRR0 = F_CPU/16/baudrate - 1;          // Set baud rate
+	UBRR0 = F_CPU / 16 / baudrate - 1;          // Set baud rate
 	UCSR0B |= (1 << TXEN0);  // Turn on transmitter
 	UCSR0B |= (1 << RXEN0); // Turn on receiver
 	UCSR0A &= ~(_BV(U2X0));
@@ -91,6 +91,9 @@ void SerialDebugGetLine(char* buffer, char echo)
 		++i;
 	}
 	buffer[i] = '\0';
+
+	// refine buffer for backspace support
+	AVRStringRefineString(buffer);
 
 	if (echo)
 	{

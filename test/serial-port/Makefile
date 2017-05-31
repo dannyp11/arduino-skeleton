@@ -2,14 +2,15 @@
 CC=avr-gcc
 CFLAGS =
 TOP = ../../
+UTILS_SUPPORT = yes
 
 # required
 SOURCES = $(wildcard *.c)
 INCLUDES = ./
 
-# extra utils such as soft serial, i2c, serial debug
-SOURCES	  += $(wildcard $(TOP)/common/utils/*.c)
-INCLUDES  += $(TOP)/common/utils/ 
+# unit test files
+TEST_SOURCES = $(TOP)/common/utils/AVRString.c
 
 # specify your preferred .mk file
-include ../../common/without-os.mk
+include $(TOP)/common/without-os.mk
+include $(TOP)/common/unittest.mk

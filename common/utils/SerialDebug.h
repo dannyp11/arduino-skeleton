@@ -12,20 +12,21 @@
 #include <string.h>
 
 #include "MemoryFree.h"
+#include "AVRString.h"
 
-#define SERIALDEBUG_DEFAULT_BAUD	9600 // default baud rate when calling SerialDebugInit()
+#define SERIALDEBUG_DEFAULT_BAUD	57600 // default baud rate when calling SerialDebugInit()
 
 #ifdef DEBUG
 #ifndef CXXTEST
 char __msg[128];
 #define LOG(msg, arg...) \
 	{  \
-	snprintf(__msg, 128, msg, ##arg);\
+	snprintf(__msg, STRING_MAXLEN, msg, ##arg);\
 	SerialDebugPrint("%s:%d - (%d) %s", __FILE__, __LINE__, freeMemory(), __msg); \
 	}
 #else
 #define LOG(msg, arg...) \
-	{ char __msg[128]; \
+	{ char __msg[STRING_MAXLEN]; \
 	sprintf(__msg, msg, ##arg);\
 	printf("%s:%d - %s \n", __FILE__, __LINE__, __msg); \
 	}
@@ -51,15 +52,15 @@ void SerialDebugInitWithBaudRate(unsigned baudrate);
 /*
  * Printf to serial port
  */
-char _msg[128];
+char _msg[STRING_MAXLEN];
 #define SerialDebugPrint(arg...) \
 { 	\
-	snprintf(_msg, 128, ##arg); \
+	snprintf(_msg, STRING_MAXLEN, ##arg); \
 	_SerialDebugPrint1(_msg); \
 }
 #define SerialDebugPrintNoEndl(arg...) \
 { 	\
-	snprintf(_msg, 128, ##arg); \
+	snprintf(_msg, STRING_MAXLEN, ##arg); \
 	_SerialDebugPrintNoEndl(_msg); \
 }
 void _SerialDebugPrint1(const char* message);

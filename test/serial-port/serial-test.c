@@ -3,7 +3,6 @@
  */
 
 #include <util/delay.h>
-
 #include "SerialDebug.h"
 
 char str1[] = "Hello World";
@@ -27,12 +26,23 @@ int main(void)
 
 	while (1)
 	{
-		SerialDebugPrint("Please enter a number :");
+		SerialDebugPrint("Please enter a string :");
 		SerialDebugGetLine(buffer, 1);
-		SerialDebugPrint("Entered number: ");
-		SerialDebugPrint(buffer);
+		SerialDebugPrint("Entered string: %s", buffer);
+		SerialDebugPrint("Exact content of entered string:");
+		int i = 0;
+		while (1)
+		{
+			if (buffer[i] == '\0' || buffer[i] == '\n' || buffer[i] == '\r')
+			{
+				break;
+			}
 
-		_delay_ms(100);
+			SerialDebugPrint(" 0x%x = %d = '%c'", buffer[i], buffer[i], buffer[i]);
+			++i;
+		}
+
+		_delay_ms(1);
 	}
 
 	return 0; /* never reached */
