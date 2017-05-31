@@ -78,12 +78,14 @@ uint8_t i2c_io(uint8_t device_addr, const uint8_t *ap, uint16_t an,
 	uint8_t status, send_stop;
 	uint8_t wrote, start_stat;
 
-	LOG("sending to %x %d bytes: ", device_addr >> 1, an);
+	LOG("sending to 0x%x %d bytes: ", device_addr >> 1, an);
 	uint16_t i;
 	for (i = 0; i < an; ++i)
 	{
 		LOG("  0x%x = %d = '%c'", ap[i], ap[i], ap[i]);
 	}
+	uint8_t * rx = rp;
+	uint16_t rxn = rn;
 
 	status = 0;
 	wrote = 0;
@@ -219,6 +221,15 @@ uint8_t i2c_io(uint8_t device_addr, const uint8_t *ap, uint16_t an,
 	nakstop:                              // Come here to send STOP after a NAK
 	if (send_stop)
 		TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO); // Send STOP condition
+
+	if (rn)
+	{
+		LOG("Received data")
+		for (i = 0; i < rxn; ++i)
+		{
+			LOG(" rx[%d] 0x%x = %d = '%c'", i, rx[i], rx[i], rx[i]);
+		}
+	}
 
 	return (status);
 }

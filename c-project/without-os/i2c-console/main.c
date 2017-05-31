@@ -182,8 +182,6 @@ void loopCommand(const char * message)
 				SerialDebugPrint("looping %d seconds for '%s'", loop_time,
 						message + strlen("loop ") + strlen(token) + 1);
 
-				TRACE()
-				;
 				uint8_t initSec = mMillis / 1000;
 				while ((uint8_t) (mMillis / 1000) - initSec
 						<= (uint8_t) loop_time)
