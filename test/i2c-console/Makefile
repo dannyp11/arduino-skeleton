@@ -1,7 +1,7 @@
 # to program to arduino, type make flash
 CC=avr-gcc
 CFLAGS = -Wextra
-DEBUG = yes
+DEBUG = no
 FLOAT_SUPPORT = no # support printf, sscanf floats
 UTILS_SUPPORT = YES # extra utils such as soft serial, i2c, serial debug
 

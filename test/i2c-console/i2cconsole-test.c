@@ -11,17 +11,25 @@
 #include <stdio.h>
 #include <util/delay.h>
 
-const char PROGMEM help1[] = "Sample command - explaination";
-const char PROGMEM help2[] = "ADDR 28        - set i2c 7-bit address as 0x28";
-const char PROGMEM help3[] = "TX 2 00 03     - send 2 bytes 0x00 and 0x03";
-const char PROGMEM help4[] =
-		"RX 6 2 ab 03   - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx";
-const char PROGMEM help5[] =
+const char PROGMEM helpaddr1[] = "Hint address: LCD 0x28, compass 0x19";
+const char PROGMEM help1[] = "Sample command     - explanation (command case insensitive)";
+const char PROGMEM help2[] = "ADDR 28            - set i2c 7-bit address as 0x28";
+const char PROGMEM help3[] = "TX 2 00 03         - send 2 bytes 0x00 and 0x03";
+const char PROGMEM help0[] = "TX \"hello world\" - send string \"hello world\"";
+const char PROGMEM help4[] = "RX 6 2 ab 03       - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx";
+const char PROGMEM help5[] = "---------------";
+const char PROGMEM help6[] = "testlcd            - test the lcd 4x20";
+const char PROGMEM help7[] = "testcompass        - test the GY-85 module";
+const char PROGMEM help8[] =
 		"========================================================================";
 
 void showHelp()
 {
 	char msg[128];
+
+	PgmStorageGet(msg, helpaddr1);
+	SerialDebugPrint(msg);
+
 	PgmStorageGet(msg, help1);
 	SerialDebugPrint(msg);
 
@@ -31,23 +39,37 @@ void showHelp()
 	PgmStorageGet(msg, help3);
 	SerialDebugPrint(msg);
 
+	PgmStorageGet(msg, help0);
+	SerialDebugPrint(msg);
+
 	PgmStorageGet(msg, help4);
 	SerialDebugPrint(msg);
 
 	PgmStorageGet(msg, help5);
 	SerialDebugPrint(msg);
+
+	PgmStorageGet(msg, help6);
+	SerialDebugPrint(msg);
+
+	PgmStorageGet(msg, help7);
+	SerialDebugPrint(msg);
+
+	PgmStorageGet(msg, help8);
+	SerialDebugPrint(msg);
 }
 
 void processMessage(const char * message)
 {
-	LOG("Processing %s", message);
+	LOG("\n\nProcessing %s", message);
 	I2CConsoleMessage cmd;
-	uint8_t parseResult = I2CConsoleParser(message, &cmd);
+
+	char message2[128];
+	strcpy(message2, message);
+	uint8_t parseResult = I2CConsoleParser(message2, &cmd);
+
 	if (parseResult == 0)
 	{
 		uint8_t i;
-		TRACE_INT(cmd.tx_len);
-
 		if (cmd.tx_len)
 		{
 			for (i = 0; i < cmd.tx_len; ++i)
@@ -60,11 +82,23 @@ void processMessage(const char * message)
 		if (sendResult == 0)
 		{
 			SerialDebugPrint("sent %s", message);
+
+			if (cmd.command == SENDNRECV)
+			{
+				SerialDebugPrint("RX result:");
+				for (i = 0; i < cmd.rx_len; ++i)
+				{
+					SerialDebugPrint(" rx[%d] = 0x%x = %d = '%c'", i, cmd.rx[i],
+							cmd.rx[i], cmd.rx[i]);
+				}
+			}
 		}
 		else
 		{
 			SerialDebugPrint("error code %d sending %s", sendResult, message);
 		}
+
+		I2CConsoleDumpCommand(&cmd);
 	}
 	else
 	{
@@ -77,12 +111,31 @@ void processMessage(const char * message)
 void testLCD()
 {
 	const char input1[] = "addr 28";
-	const char input2[] = "tx 2 fe 41";
+	const char input2[] = "tx 2 fe a3";
 	const char input3[] = "tx 2 fe 4b";
+	const char input4[] = "tx 2 fe 51";
+	const char input5[] = "tx \"hello world\"";
 
 	processMessage(input1);
 	processMessage(input2);
 	processMessage(input3);
+	processMessage(input4);
+	processMessage(input5);
+
+	TRACE()
+}
+
+void testCompass()
+{
+	const char input1[] = "addr 1e";
+	const char input2[] = "tx 2 2 0";
+	const char input3[] = "tx 2 0 90";
+	const char input4[] = "rx 6 1 3";
+
+	processMessage(input1);
+	processMessage(input2);
+	processMessage(input3);
+	processMessage(input4);
 }
 
 int main()
@@ -94,17 +147,24 @@ int main()
 		char buffer[50];
 
 		SerialDebugPrint(" ");
-		SerialDebugPrint("Enter i2c command or type help");
+		SerialDebugPrint(
+				"Enter i2c command or type help (current address 0x%x)",
+				I2CConsoleGetCurrentAddress());
 		SerialDebugGetLine(buffer, 1);
 
 		if (strcasecmp(buffer, "help") == 0)
 		{
 			showHelp();
 		}
-		else if (strcasecmp(buffer, "test") == 0)
+		else if (strcasecmp(buffer, "testlcd") == 0)
 		{
 			// test with lcd
 			testLCD();
+		}
+		else if (strcasecmp(buffer, "testcompass") == 0)
+		{
+			// test with compass
+			testCompass();
 		}
 		else
 		{
