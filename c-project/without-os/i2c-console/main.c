@@ -208,7 +208,8 @@ static void incMillis()
 
 int main()
 {
-	SerialDebugInit();
+	SerialDebugInitWithBaudRate(57600);
+
 	Timer1Init(1);
 	mMillis = 0;
 	Timer1SetCallback(incMillis);

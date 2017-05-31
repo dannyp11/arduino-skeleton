@@ -13,6 +13,8 @@
 
 #include "MemoryFree.h"
 
+#define SERIALDEBUG_DEFAULT_BAUD	9600 // default baud rate when calling SerialDebugInit()
+
 #ifdef DEBUG
 #ifndef CXXTEST
 char __msg[128];
@@ -37,9 +39,14 @@ char __msg[128];
 #define TRACE_STRING(var) LOG("[%s] = %s", #var, var);
 
 /*
- * Init serial port
+ * Init serial port, use default baud rate
  */
 void SerialDebugInit(void);
+
+/**
+ * Set baud rate for serial port and reinit it
+ */
+void SerialDebugInitWithBaudRate(unsigned baudrate);
 
 /*
  * Printf to serial port

@@ -9,8 +9,7 @@
 #include <stdio.h>
 #include "SerialDebug.h"
 
-#define BAUD 9600              // Baud rate used by the LCD
-#define MYUBRR F_CPU/16/BAUD-1   // Value for UBRR0 register
+#define MYUBRR F_CPU/16/SERIALDEBUG_DEFAULT_BAUD-1   // Value for UBRR0 register
 
 /*
  serial_in - Read a byte from the USART0 and return it
@@ -46,14 +45,21 @@ void sci_outs(const char *s)
 
 void SerialDebugInit()
 {
-	UBRR0 = MYUBRR;          // Set baud rate
+	SerialDebugInitWithBaudRate(SERIALDEBUG_DEFAULT_BAUD);
+}
+
+void SerialDebugInitWithBaudRate(unsigned baudrate)
+{
+	UBRR0 = F_CPU/16/baudrate - 1;          // Set baud rate
 	UCSR0B |= (1 << TXEN0);  // Turn on transmitter
 	UCSR0B |= (1 << RXEN0); // Turn on receiver
 	UCSR0A &= ~(_BV(U2X0));
 	UCSR0C = _BV(UCSZ01) | _BV(UCSZ00); /* 8-bit data */
 
-	SerialDebugPrint("Serial Debug activated");
-	SerialDebugPrint("Compiled on : %s %s", __DATE__, __TIME__);
+	SerialDebugPrint("===============================================");
+	SerialDebugPrint("| Serial Debug activated, baud rate %u", baudrate);
+	SerialDebugPrint("| Compiled on : %s %s", __DATE__, __TIME__);
+	SerialDebugPrint("===============================================");
 }
 
 /*
