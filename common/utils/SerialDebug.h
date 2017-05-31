@@ -50,7 +50,14 @@ char _msg[128];
 	snprintf(_msg, 128, ##arg); \
 	_SerialDebugPrint1(_msg); \
 }
+#define SerialDebugPrintNoEndl(arg...) \
+{ 	\
+	snprintf(_msg, 128, ##arg); \
+	_SerialDebugPrintNoEndl(_msg); \
+}
 void _SerialDebugPrint1(const char* message);
+void _SerialDebugPrintNoEndl(const char* message);
+
 
 /*
  * Fetches byte from receive buffer

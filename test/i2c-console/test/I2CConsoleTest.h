@@ -85,10 +85,10 @@ public:
 		TS_ASSERT_EQUALS(message.isValid, 1);
 		TS_ASSERT_EQUALS(strcmp(message.message, "console test here"), 0);
 
-//		TS_ASSERT_EQUALS(I2CConsoleParser("rx 6 \"rx test here\"", &message),
-//				0);
-//		TS_ASSERT_EQUALS(message.isValid, 1);
-//		TS_ASSERT_EQUALS(strcmp(message.message, "rx test here"), 0);
+		TS_ASSERT_EQUALS(I2CConsoleParser("rx 6 \"rx test here\"", &message),
+				0);
+		TS_ASSERT_EQUALS(message.isValid, 1);
+		TS_ASSERT_EQUALS(strcmp(message.message, "rx test here"), 0);
 	}
 
 	void testConsoleParserFail()

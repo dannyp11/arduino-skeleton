@@ -7,25 +7,33 @@
 #include "I2CConsole.h"
 #include "SerialDebug.h"
 #include "PgmStorage.h"
+#include "Timer.h"
 
 #include <stdio.h>
 #include <util/delay.h>
 
 const char PROGMEM helpaddr1[] = "Hint address: LCD 0x28, compass 0x19";
-const char PROGMEM help1[] = "Sample command     - explanation (command case insensitive)";
-const char PROGMEM help2[] = "ADDR 28            - set i2c 7-bit address as 0x28";
+const char PROGMEM help1[] =
+		"Sample command     - explanation (command case insensitive)";
+const char PROGMEM help2[] =
+		"ADDR 28            - set i2c 7-bit address as 0x28";
 const char PROGMEM help3[] = "TX 2 00 03         - send 2 bytes 0x00 and 0x03";
 const char PROGMEM help0[] = "TX \"hello world\" - send string \"hello world\"";
-const char PROGMEM help4[] = "RX 6 2 ab 03       - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx";
+const char PROGMEM help4[] =
+		"RX 6 2 ab 03       - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx";
+const char PROGMEM helploop1[] = "LOOP 2 TX 2 00 03     - loop the command 'TX 2 00 03' for 2 seconds";
+const char PROGMEM helploop2[] = "LOOP 5 RX 6 1 ab     - loop the command 'RX 6 1 ab' for 5 seconds";
 const char PROGMEM help5[] = "---------------";
 const char PROGMEM help6[] = "testlcd            - test the lcd 4x20";
 const char PROGMEM help7[] = "testcompass        - test the GY-85 module";
 const char PROGMEM help8[] =
 		"========================================================================";
 
+static volatile unsigned long mMillis;
+
 void showHelp()
 {
-	char msg[128];
+	char msg[PGM_SIZE];
 
 	PgmStorageGet(msg, helpaddr1);
 	SerialDebugPrint(msg);
@@ -43,6 +51,12 @@ void showHelp()
 	SerialDebugPrint(msg);
 
 	PgmStorageGet(msg, help4);
+	SerialDebugPrint(msg);
+
+	PgmStorageGet(msg, helploop1);
+	SerialDebugPrint(msg);
+
+	PgmStorageGet(msg, helploop2);
 	SerialDebugPrint(msg);
 
 	PgmStorageGet(msg, help5);
@@ -63,7 +77,7 @@ void processMessage(const char * message)
 	LOG("\n\nProcessing %s", message);
 	I2CConsoleMessage cmd;
 
-	char message2[128];
+	char message2[I2CMESSAGE_MAXLEN];
 	strcpy(message2, message);
 	uint8_t parseResult = I2CConsoleParser(message2, &cmd);
 
@@ -138,19 +152,72 @@ void testCompass()
 	processMessage(input4);
 }
 
+void loopCommand(const char * message)
+{
+	unsigned loop_time = 0;
+	uint8_t n = 0;
+	char loopMesssage[20];
+	strncpy(loopMesssage, message, 20);
+
+	char * token = strtok(loopMesssage, " ");
+	while (token != NULL)
+	{
+		if (n == 1)
+		{
+			if (sscanf(token, "%u ", &loop_time) != 1)
+			{
+				SerialDebugPrint("error parsing loop in '%s'", message);
+			}
+			else
+			{
+				// found loop time
+				SerialDebugPrint("looping %d seconds for '%s'", loop_time, message + strlen("loop ") + strlen(token) + 1);
+
+				TRACE();
+				uint8_t initSec = mMillis/1000;
+				while ((uint8_t)(mMillis / 1000) - initSec <= (uint8_t) loop_time)
+				{
+					processMessage(message + strlen("loop ") + strlen(token) + 1);
+				}
+			}
+
+			break;
+		}
+
+		token = strtok(NULL, " ");
+		++n;
+	}
+}
+
+static void incMillis()
+{
+	++mMillis;
+}
+
 int main()
 {
 	SerialDebugInit();
+	Timer1Init(1);
+	mMillis = 0;
+	Timer1SetCallback(incMillis);
 
 	while (1)
 	{
-		char buffer[50];
+		char buffer[I2CMESSAGE_MAXLEN];
+		char firstWord[20];
 
 		SerialDebugPrint(" ");
 		SerialDebugPrint(
 				"Enter i2c command or type help (current address 0x%x)",
 				I2CConsoleGetCurrentAddress());
 		SerialDebugGetLine(buffer, 1);
+		uint8_t i = 0;
+		while(buffer[i] != '\0' && buffer[i] != ' ')
+		{
+			firstWord[i] = buffer[i];
+			++i;
+		}
+		firstWord[i] = '\0';
 
 		if (strcasecmp(buffer, "help") == 0)
 		{
@@ -165,6 +232,11 @@ int main()
 		{
 			// test with compass
 			testCompass();
+		}
+		else if (strcasecmp(firstWord, "loop") == 0)
+		{
+			// loop tx or rx command
+			loopCommand(buffer);
 		}
 		else
 		{

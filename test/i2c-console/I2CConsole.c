@@ -169,9 +169,9 @@ uint8_t processRX(const char * message, I2CConsoleMessage * result,
 
 	uint8_t n = 0;
 	char * token;
-	char message2[128];
+	char message2[I2CMESSAGE_MAXLEN];
 	strcpy(message2, message);
-	token = strtok((char*) message, " ");
+	token = strtok(message2, " ");
 	while (token != NULL)
 	{
 		// break into token strings
@@ -189,7 +189,7 @@ uint8_t processRX(const char * message, I2CConsoleMessage * result,
 				{
 					// parse tx part
 					errcode = processTXPart(
-							(char*) message2 + strlen("RX ") + strlen(token)
+							(char*) message + strlen("RX ") + strlen(token)
 									+ 1, result, errcode);
 
 					break;
@@ -306,7 +306,7 @@ uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command)
 
 	if (!retVal)
 	{
-		uint8_t data[256]; // for converting to uint8_t array
+		uint8_t data[I2CMESSAGE_MAXLEN]; // for converting to uint8_t array
 
 		if (command->command == SET_ADDRESS)
 		{

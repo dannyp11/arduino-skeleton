@@ -10,6 +10,8 @@
 
 #include <inttypes.h>
 
+#define I2CMESSAGE_MAXLEN		128
+
 typedef enum _i2ccommand
 {
 	SEND = 0,
@@ -24,7 +26,7 @@ typedef struct _i2cMessage
 	int tx_len, rx_len;
 	unsigned tx[10];
 	uint8_t rx[10];
-	char message[256];
+	char message[I2CMESSAGE_MAXLEN];
 	unsigned address;
 } I2CConsoleMessage;
 

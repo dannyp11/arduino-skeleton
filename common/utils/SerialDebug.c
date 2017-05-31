@@ -65,6 +65,11 @@ void _SerialDebugPrint1(const char* message)
 	sci_outs("\n\r");
 }
 
+void _SerialDebugPrintNoEndl(const char* message)
+{
+	sci_outs(message);
+}
+
 void SerialDebugGetLine(char* buffer, char echo)
 {
 	uint8_t i = 0;
