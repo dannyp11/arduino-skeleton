@@ -7,7 +7,7 @@
 
 #include "NMEAParser.h"
 #include "SerialDebug.h"
-#include "../LCD-4x20/LCD.h"
+#include "LCD.h"
 
 #include <util/delay.h>
 #include <string.h>

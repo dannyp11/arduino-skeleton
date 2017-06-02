@@ -27,8 +27,12 @@ Note: this repo doesn't support Arduino IDE. Everything must be run from Makefil
 # Usage
         go to c*-project/with*-os/ directory and use its makefile
         go to test/ to checkout individual module test code, all code here must be in C except cxxtest headers
+
+# Completed projects
+        +--c-project/without-os/GPS-breakout-board      - i2c console app for arduino, this tool makes i2c debug easier
+        +--c-project/without-os/i2c-console             - gps tracker app that shows parsed distance/angle to lcd and serial port 
 	
 # Question & Bug fix?
-	Please email author tdpham1105@yahoo.com
-	Or file issue via github
+        Please email author tdpham1105@yahoo.com
+        Or file issue via github
 
