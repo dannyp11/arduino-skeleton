@@ -15,7 +15,7 @@
 int main(void)
 {
 	LCDInit();
-	SerialDebugInit();
+	SerialDebugInitWithBaudRate(9600);
 	float distance = 0.0f;
 	NMEAData initLocation, prevData;
 	initLocation.isValid = 0;
@@ -29,6 +29,11 @@ int main(void)
 			continue;
 
 		NMEAParserParseString(gps_msg, &initLocation);
+
+		if (!initLocation.isValid)
+		{
+			SerialDebugPrint("Failed initial parsed message: %s", gps_msg);
+		}
 	}
 
 	prevData = initLocation;
@@ -57,12 +62,17 @@ int main(void)
 			float angle = NMEAGetAngle(&initLocation.location, &gpsData.location);
 			SerialDebugPrint("angle from initial location %.2f degrees", angle);
 
+			float distanceToInitPlace = NMEAGetDistance(&initLocation.location, &gpsData.location);
+			SerialDebugPrint(" %4.0f m to initial place", distanceToInitPlace);
+
 			SerialDebugPrint(" ");
 
 			LCDSetCursor(1,0);
 			LCDPrint("traveled %.2f m", distance);
 			LCDSetCursor(2,0);
 			LCDPrint("angle %.2f degrees", angle);
+			LCDSetCursor(3,0);
+			LCDPrint("%4.0f m to init place", distanceToInitPlace);
 
 			prevData = gpsData;
 		}

@@ -4,7 +4,7 @@
 TEST_SOURCES ?=
 TEST_HEADERS ?= $(wildcard test/*Test.h) 
 TEST_CC =clang++
-TEST_CFLAGS = -g -O0 -DCXXTEST=1
+TEST_CFLAGS += -g -O0 -DCXXTEST=1
 IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
 
 TRUE = 1 yes YES true TRUE
@@ -24,17 +24,20 @@ TEST_BIN_OBJS  	:= $(filter-out %.h, $(TEST_BIN_OBJS))
 
 TEST_BINARIES	= $(patsubst %.h, %.cxxtest, $(TEST_HEADERS))
 
-test_gen: 
+# main rules to run
+##########################################################################################
+TEST_GEN: 
 	$(foreach f, $(TEST_HEADERS), cxxtestgen --error-printer -o $(f).cpp $(f) ; )
+	$(MAKE) test_compile
 
-check: test_gen 
-	$(MAKE) TEST_COMPILE
+check: TEST_GEN 
 	@printf "Running test binaries \n\n"
 	-$(foreach bin, $(TEST_BINARIES), ./$(bin) ; )
 	@printf "\nDone running tests\n"
 	$(MAKE) testclean > /dev/null
+##########################################################################################
 
-TEST_COMPILE: $(TEST_OBJECTS) $(TEST_BIN_OBJS) $(TEST_BINARIES)
+test_compile: $(TEST_OBJECTS) $(TEST_BIN_OBJS) $(TEST_BINARIES)
 
 %.cxxtest: %.ocxx
 	$(TEST_CC) $(TEST_CFLAGS) $(IFLAGS) $(TEST_OBJECTS) $< -o $@

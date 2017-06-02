@@ -15,10 +15,10 @@
 const char PROGMEM helpaddr1[] = "Hint address: LCD 0x28, compass 0x19";
 const char PROGMEM help1[] =
 		"Sample command \t\t - explanation (command case insensitive)";
-const char PROGMEM help2[] =
-		"ADDR 28 \t\t - set i2c 7-bit address as 0x28";
+const char PROGMEM help2[] = "ADDR 28 \t\t - set i2c 7-bit address as 0x28";
 const char PROGMEM help3[] = "TX 2 00 03 \t\t - send 2 bytes 0x00 and 0x03";
-const char PROGMEM help0[] = "TX \"hello world\" \t - send string \"hello world\"";
+const char PROGMEM help0[] =
+		"TX \"hello world\" \t - send string \"hello world\"";
 const char PROGMEM help4[] =
 		"RX 6 2 ab 03 \t\t - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx";
 const char PROGMEM help41[] = "SLOW 0 \t\t\t - set slow sending off";
@@ -28,11 +28,15 @@ const char PROGMEM helploop2[] =
 		"LOOP 5 RX 6 1 ab \t - loop the command 'RX 6 1 ab' for 5 seconds";
 const char PROGMEM help5[] = "---------------";
 const char PROGMEM help6[] = "testlcd \t\t - test the lcd 4x20";
-const char PROGMEM help7[] = "testcompass \t\t - test the GY-85 module";
+const char PROGMEM help7[] = "testgy85compass \t - test the GY-85 compass";
+const char PROGMEM help71[] = "testgy85accel \t\t - test the GY-85 accelerator";
+const char PROGMEM help72[] = "HISTORY \t\t - show past entered messages";
 const char PROGMEM help8[] =
 		"========================================================================";
 
 static volatile unsigned long mMillis;
+
+void processMessage(const char * buffer);
 
 void showHelp()
 {
@@ -74,13 +78,120 @@ void showHelp()
 	PgmStorageGet(msg, help7);
 	SerialDebugPrint(msg);
 
+	PgmStorageGet(msg, help71);
+	SerialDebugPrint(msg);
+
+	// history help
+#ifndef DEBUG
+	PgmStorageGet(msg, help72);
+	SerialDebugPrint(msg);
+#endif
+
 	PgmStorageGet(msg, help8);
 	SerialDebugPrint(msg);
 }
 
-void processMessage(const char * message)
+const char PROGMEM testLCD1[] = "addr 28";
+const char PROGMEM testLCD2[] = "slow 1";
+const char PROGMEM testLCD3[] = "tx 2 fe a3";
+const char PROGMEM testLCD4[] = "tx 2 fe 4b";
+const char PROGMEM testLCD5[] = "tx 2 fe 51";
+const char PROGMEM testLCD6[] = "tx \"hello world\"";
+
+void testLCD()
 {
-	LOG("\n\nProcessing %s", message);
+	char msg[PGM_SIZE];
+
+	PgmStorageGet(msg, testLCD1);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testLCD2);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testLCD3);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testLCD4);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testLCD5);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testLCD6);
+	processMessage(msg);
+}
+
+const char PROGMEM testcompass1[] = "addr 1e";
+const char PROGMEM testcompass2[] = "slow 0";
+const char PROGMEM testcompass3[] = "tx 2 2 0";
+const char PROGMEM testcompass4[] = "tx 2 0 90";
+const char PROGMEM testcompass5[] = "rx 6 1 3";
+
+void testGY85Compass()
+{
+	char msg[PGM_SIZE];
+
+	PgmStorageGet(msg, testcompass1);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testcompass2);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testcompass3);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testcompass4);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testcompass5);
+	processMessage(msg);
+}
+
+const char PROGMEM testaccel1[] = "addr 53";
+const char PROGMEM testaccel2[] = "slow 0";
+const char PROGMEM testaccel3[] = "tx 2 31 1"; // data format
+const char PROGMEM testaccel4[] = "tx 2 2d 8 "; // power ctl
+const char PROGMEM testaccel5[] = "loop 5 rx 6 1 32"; // read 6 bytes starting from address 0x32
+
+void testGY85Accel()
+{
+	char msg[PGM_SIZE];
+
+	PgmStorageGet(msg, testaccel1);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testaccel2);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testaccel3);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testaccel4);
+	processMessage(msg);
+
+	PgmStorageGet(msg, testaccel5);
+	processMessage(msg);
+}
+
+void showHistory()
+{
+#ifndef DEBUG
+	uint8_t i;
+	SerialDebugPrint("------------------------------");
+	for (i = 0; i < I2CConsoleStackGetCount(); ++i)
+	{
+		SerialDebugPrint(I2CConsoleStackMoveDown());
+	}
+#endif
+}
+
+static void incMillis()
+{
+	++mMillis;
+}
+
+void parseNRunMessage(const char * message)
+{
 	I2CConsoleMessage cmd;
 
 	char message2[I2CMESSAGE_MAXLEN];
@@ -124,40 +235,6 @@ void processMessage(const char * message)
 	{
 		SerialDebugPrint("error code %d parsing %s", parseResult, message);
 	}
-
-	_delay_ms(150);
-}
-
-void testLCD()
-{
-	const char input1[] = "addr 28";
-	const char input0[] = "slow 1";
-	const char input2[] = "tx 2 fe a3";
-	const char input3[] = "tx 2 fe 4b";
-	const char input4[] = "tx 2 fe 51";
-	const char input5[] = "tx \"hello world\"";
-
-	processMessage(input1);
-	processMessage(input0);
-	processMessage(input2);
-	processMessage(input3);
-	processMessage(input4);
-	processMessage(input5);
-}
-
-void testCompass()
-{
-	const char input1[] = "addr 1e";
-	const char input0[] = "slow 0";
-	const char input2[] = "tx 2 2 0";
-	const char input3[] = "tx 2 0 90";
-	const char input4[] = "rx 6 1 3";
-
-	processMessage(input1);
-	processMessage(input0);
-	processMessage(input2);
-	processMessage(input3);
-	processMessage(input4);
 }
 
 void loopCommand(const char * message)
@@ -186,7 +263,7 @@ void loopCommand(const char * message)
 				while ((uint8_t) (mMillis / 1000) - initSec
 						<= (uint8_t) loop_time)
 				{
-					processMessage(
+					parseNRunMessage(
 							message + strlen("loop ") + strlen(token) + 1);
 				}
 			}
@@ -199,14 +276,41 @@ void loopCommand(const char * message)
 	}
 }
 
-static void incMillis()
+/*
+ * Supports i2cconsole parser format and loop
+ */
+void processMessage(const char * buffer)
 {
-	++mMillis;
+	LOG("\n\nProcessing %s", buffer);
+
+	uint8_t i = 0;
+	char firstWord[20];
+	while (buffer[i] != '\0' && buffer[i] != ' ')
+	{
+		firstWord[i] = buffer[i];
+		++i;
+	}
+	firstWord[i] = '\0';
+
+	if (strcasecmp(firstWord, "loop") == 0)
+	{
+		loopCommand(buffer);
+	}
+	else
+	{
+		parseNRunMessage(buffer);
+	}
+
+	_delay_ms(150);
 }
 
 int main()
 {
 	SerialDebugInitWithBaudRate(57600);
+
+#ifndef DEBUG
+	I2CConsoleStackInit();
+#endif
 
 	Timer1Init(1);
 	mMillis = 0;
@@ -215,43 +319,45 @@ int main()
 	while (1)
 	{
 		char buffer[I2CMESSAGE_MAXLEN];
-		char firstWord[20];
 
 		SerialDebugPrint(" ");
 		SerialDebugPrint(
 				"Enter i2c command or type help (current address 0x%x, slow status %u)",
 				I2CConsoleGetCurrentAddress(), I2CConsoleGetSlowSendingStatus());
 		SerialDebugGetLine(buffer, 1);
-		uint8_t i = 0;
-		while (buffer[i] != '\0' && buffer[i] != ' ')
-		{
-			firstWord[i] = buffer[i];
-			++i;
-		}
-		firstWord[i] = '\0';
+		AVRStringTrimWhiteSpace(buffer);
+		AVRStrinStripExtraSpace(buffer);
 
 		if (strcasecmp(buffer, "help") == 0)
 		{
 			showHelp();
+		}
+		else if (strcasecmp(buffer, "history") == 0)
+		{
+			// show command history
+			showHistory();
 		}
 		else if (strcasecmp(buffer, "testlcd") == 0)
 		{
 			// test with lcd
 			testLCD();
 		}
-		else if (strcasecmp(buffer, "testcompass") == 0)
+		else if (strcasecmp(buffer, "testgy85compass") == 0)
 		{
 			// test with compass
-			testCompass();
+			testGY85Compass();
 		}
-		else if (strcasecmp(firstWord, "loop") == 0)
+		else if (strcasecmp(buffer, "testgy85accel") == 0)
 		{
-			// loop tx or rx command
-			loopCommand(buffer);
+			// test with accelerometer
+			testGY85Accel();
 		}
 		else
 		{
 			// process n send buffer
+#ifndef DEBUG
+			I2CConsoleStackPush(buffer);
+#endif
 			processMessage(buffer);
 		}
 

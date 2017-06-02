@@ -22,7 +22,7 @@ char __msg[128];
 #define LOG(msg, arg...) \
 	{  \
 	snprintf(__msg, STRING_MAXLEN, msg, ##arg);\
-	SerialDebugPrint("%s:%d - (%d) %s", __FILE__, __LINE__, freeMemory(), __msg); \
+	SerialDebugPrint("%s:%d - (%d)\t%s", __FILE__, __LINE__, freeMemory(), __msg); \
 	}
 #else
 #define LOG(msg, arg...) \
@@ -76,10 +76,18 @@ char SerialDebugGetChar(void);
  * Get line from serial input
  * This will wait until \n is entered, so not async compatible
  *
+ * Also, it will contain custom stopchars
+ *
  * @param buffer - line will be stored in here, make sure buffer is allocated
  * 					before calling this function
  * @param echo - 1 will echo character to console
  */
 void SerialDebugGetLine(char* buffer, char echo);
+
+/**
+ * Set custom stop chars beside normal ones like \r \n
+ * @param stopChars - has to be normal viewable chars such as "[]{}", limit to 20 chars
+ */
+void SerialDebugSetStopChars(const char * stopChars);
 
 #endif /* SERIALDEBUG_H_ */

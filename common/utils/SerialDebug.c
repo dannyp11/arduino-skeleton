@@ -11,13 +11,27 @@
 
 #define MYUBRR F_CPU/16/SERIALDEBUG_DEFAULT_BAUD-1   // Value for UBRR0 register
 
+// custom up/down btn that breaks getline loop
+static char g_serialdebug_stopchars[21];
+static uint8_t g_serialdebug_stopcharsLen;
+
+void SerialDebugSetStopChars(const char * stopChars)
+{
+	strcpy(g_serialdebug_stopchars, stopChars);
+	g_serialdebug_stopcharsLen = strlen(stopChars);
+
+	SerialDebugPrint("===============================================");
+	SerialDebugPrint("| Serial Debug Set Custom Chars '%s'", stopChars);
+	SerialDebugPrint("===============================================");
+}
+
 /*
  serial_in - Read a byte from the USART0 and return it
  */
 char SerialDebugGetChar()
 {
 	loop_until_bit_is_set(UCSR0A, RXC0); /* Wait until data exists. */
-	return UDR0;
+	return (char) UDR0;
 }
 
 /*
@@ -31,7 +45,7 @@ void sci_out(char ch)
 
 /*
  sci_outs - Print the contents of the character string "s" out the SCI
- port. The string must be terminated by a zero byte.
+ port. The stSerialDebugSetStopCharsring must be terminated by a zero byte.
  */
 void sci_outs(const char *s)
 {
@@ -59,7 +73,12 @@ void SerialDebugInitWithBaudRate(unsigned baudrate)
 	SerialDebugPrint("===============================================");
 	SerialDebugPrint("| Serial Debug activated, baud rate %u", baudrate);
 	SerialDebugPrint("| Compiled on : %s %s", __DATE__, __TIME__);
+#ifdef DEBUG
+	SerialDebugPrint("| Debug mode ON");
+#endif
 	SerialDebugPrint("===============================================");
+
+	g_serialdebug_stopcharsLen = 0;
 }
 
 /*
@@ -76,6 +95,35 @@ void _SerialDebugPrintNoEndl(const char* message)
 	sci_outs(message);
 }
 
+uint8_t isDefaultStopCharacter(char c)
+{
+	uint8_t retVal = 0;
+	const char stopChars[] = { '\n', '\0', '\r' };
+	uint8_t i;
+	for (i = 0; i < 3; ++i)
+	{
+		retVal |= (stopChars[i] == c);
+	}
+	return retVal;
+}
+
+uint8_t isCustomStopCharacter(char c)
+{
+	uint8_t retVal = 0;
+
+	// custom stop chars
+	uint8_t i;
+	if (g_serialdebug_stopcharsLen)
+	{
+		for (i = 0; i < g_serialdebug_stopcharsLen; ++i)
+		{
+			retVal |= (c == g_serialdebug_stopchars[i]);
+		}
+	}
+
+	return retVal;
+}
+
 void SerialDebugGetLine(char* buffer, char echo)
 {
 	uint8_t i = 0;
@@ -84,19 +132,33 @@ void SerialDebugGetLine(char* buffer, char echo)
 		buffer[i] = SerialDebugGetChar();
 		if (echo)
 		{
-			sci_out(buffer[i]); // echo
-
 			if (buffer[i] == '\b')
 			{
 				sci_outs(" \b");
 			}
+
+			if (!isCustomStopCharacter(buffer[i]))
+			{
+				sci_out(buffer[i]); // echo
+			}
 		}
-		if (buffer[i] == '\n' || buffer[i] == '\r')
+
+		if (isCustomStopCharacter(buffer[i]))
+		{
+			++i;
 			break;
+		}
+
+		if (isDefaultStopCharacter(buffer[i]))
+		{
+			break;
+		}
+
 		++i;
 	}
 	buffer[i] = '\0';
-	if (buffer[0] == '\b') buffer[0] = 0x02; // \b at start of string
+	if (buffer[0] == '\b')
+		buffer[0] = 0x02; // \b at start of string
 
 	// refine buffer for backspace support
 	AVRStringRefineString(buffer);

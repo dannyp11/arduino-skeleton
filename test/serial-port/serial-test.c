@@ -16,6 +16,7 @@ int main(void)
 {
 
 	SerialDebugInit();
+	SerialDebugSetStopChars("[]");
 
 	SerialDebugPrint(str1);
 	SerialDebugPrint(str3);
@@ -26,7 +27,7 @@ int main(void)
 
 	while (1)
 	{
-		SerialDebugPrint("Please enter a string :");
+		SerialDebugPrint("Please enter a string : ");
 		SerialDebugGetLine(buffer, 1);
 		SerialDebugPrint("Entered string: %s", buffer);
 		SerialDebugPrint("Exact content of entered string:");
@@ -38,7 +39,7 @@ int main(void)
 				break;
 			}
 
-			SerialDebugPrint(" 0x%x = %d = '%c'", buffer[i], buffer[i], buffer[i]);
+			SerialDebugPrint(" 0x%x \t= %d \t= '%c'", buffer[i], buffer[i], buffer[i]);
 			++i;
 		}
 

@@ -224,9 +224,9 @@ uint8_t processRX(const char * message, I2CConsoleMessage * result,
 	return errcode;
 }
 /**
- * log - done command:
+ * log - done command: tx rx addr slow
  *
- * wip - tx string
+ * wip -
  *
  * @param message
  * @param result
@@ -242,6 +242,7 @@ uint8_t I2CConsoleParser(const char * message, I2CConsoleMessage * result)
 	result->message[0] = '\0';
 
 	char command[10];
+
 	if (sscanf(message, "%s ", command) != 1)
 	{
 		TRACE()
@@ -281,6 +282,7 @@ uint8_t I2CConsoleParser(const char * message, I2CConsoleMessage * result)
 
 void I2CConsoleDumpCommand(const I2CConsoleMessage * command)
 {
+#ifdef DEBUG1
 	LOG("========================================================");
 	LOG("address %x", command->address);
 	TRACE_INT(command->isDelayBetweenBytes);
@@ -311,6 +313,9 @@ void I2CConsoleDumpCommand(const I2CConsoleMessage * command)
 		}
 	}
 	LOG("========================================================");
+#else
+	(void) command;
+#endif
 }
 
 #ifndef CXXTEST

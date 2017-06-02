@@ -45,7 +45,7 @@ typedef struct _i2cMessage
  * LOOP 5 RX 6 2 ab 03 	- loop in 5 seconds for sending RX 6 2 ab 03
  * SLOW 0			 - set slow sending off
  *
- * @param message
+ * @param inputmessage
  * @param result
  * @return	- 0 on success
  * 			- 1 on format error
@@ -68,6 +68,8 @@ uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command);
 /**
  * dump I2CConsoleMessage info to serial/stdout
  *
+ * note: very expensive, set DEBUG1 flag to enable this api
+ *
  * @param command
  */
 void I2CConsoleDumpCommand(const I2CConsoleMessage * command);
@@ -85,5 +87,53 @@ uint8_t I2CConsoleGetCurrentAddress();
  * @return - 1 on 0 off
  */
 uint8_t I2CConsoleGetSlowSendingStatus();
+
+///////////////////////////////////////////////////////////
+/// Command history support
+///////////////////////////////////////////////////////////
+
+/**
+ * get previous saved message, doesn't actually clear it
+ *
+ * @return message if exists, NULL if none
+ */
+const char * I2CConsoleStackMoveUp();
+
+/**
+ * get next saved message, doesn't actually clear it
+ *
+ * @return message if exists, NULL if none
+ */
+const char * I2CConsoleStackMoveDown();
+
+/**
+ * Push to stack message history, this will roll over obsolete messages
+ * Limit to 5 history
+ *
+ * @param message - string to push in
+ */
+void I2CConsoleStackPush(const char * message);
+
+/**
+ * Reset stack current index to start index
+ */
+void I2CConsoleStackResetIndex();
+
+/**
+ * Call this before calling I2CConsoleStack* apis
+ */
+void I2CConsoleStackInit();
+
+/**
+ * Force init stack
+ */
+void I2CConsoleStackReInit();
+
+/**
+ * get stack count
+ *
+ * @return stack count
+ */
+uint8_t I2CConsoleStackGetCount();
 
 #endif /* TEST_I2C_CONSOLE_I2CCONSOLE_H_ */

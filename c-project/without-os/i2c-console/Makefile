@@ -12,8 +12,9 @@ INCLUDES = ./
 
 # unit test files
 # remember to put cxx test headers in test/*Test.h
-TEST_SOURCES = I2CConsole.c
+TEST_SOURCES = I2CConsole.c I2CConsoleStack.c
 TEST_DEBUG = no
+TEST_CFLAGS = -std=gnu++0x
 
 # specify your preferred .mk file
 include $(TOP)/common/without-os.mk

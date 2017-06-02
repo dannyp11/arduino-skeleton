@@ -9,11 +9,12 @@
 
 #include <stdio.h>
 #include <string.h>
-
+#include <ctype.h>
 
 void AVRStringRefineString(char * buffer)
 {
-	if (!strlen(buffer)) return;
+	if (!strlen(buffer))
+		return;
 
 	char message[STRING_MAXLEN];
 
@@ -36,4 +37,34 @@ void AVRStringRefineString(char * buffer)
 	}
 	message[j] = '\0';
 	strcpy(buffer, message);
+}
+
+char * AVRStringTrimWhiteSpace(char *str)
+{
+	char *end;
+
+	// Trim leading space
+	while (isspace((unsigned char) *str))
+		str++;
+
+	if (*str == 0)  // All spaces?
+		return str;
+
+	// Trim trailing space
+	end = str + strlen(str) - 1;
+	while (end > str && isspace((unsigned char) *end))
+		end--;
+
+	// Write new null terminator
+	*(end + 1) = 0;
+
+	return str;
+}
+
+void AVRStrinStripExtraSpace(char* str) {
+  int i,x;
+  for(i=x=0; str[i]; ++i)
+    if(!isspace(str[i]) || (i>0 && !isspace(str[i-1])))
+      str[x++] = str[i];
+  str[x] = '\0';
 }
