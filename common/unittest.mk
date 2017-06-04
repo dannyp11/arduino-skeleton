@@ -30,11 +30,20 @@ TEST_GEN:
 	$(foreach f, $(TEST_HEADERS), cxxtestgen --error-printer -o $(f).cpp $(f) ; )
 	$(MAKE) test_compile
 
+ifneq ($(filter $(BRIEF), $(TRUE)),) # check if compile message should be output, BRIEF means no
+check: 
+	$(MAKE) TEST_GEN > /dev/null 
+	@printf "Running test binaries \n\n"
+	-$(foreach bin, $(TEST_BINARIES), ./$(bin) ; )
+	@printf "\nDone running tests\n"
+	$(MAKE) cleantest > /dev/null
+else
 check: TEST_GEN 
 	@printf "Running test binaries \n\n"
 	-$(foreach bin, $(TEST_BINARIES), ./$(bin) ; )
 	@printf "\nDone running tests\n"
 	$(MAKE) cleantest > /dev/null
+endif
 ##########################################################################################
 
 test_compile: $(TEST_OBJECTS) $(TEST_BIN_OBJS) $(TEST_BINARIES)
