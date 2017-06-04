@@ -4,7 +4,7 @@
 TEST_SOURCES ?=
 TEST_HEADERS ?= $(wildcard test/*Test.h) 
 TEST_CC =clang++
-TEST_CFLAGS += -g -O0 -DCXXTEST=1
+TEST_CFLAGS += -g -O0 -Wall -Wextra -DCXXTEST=1
 IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
 
 TRUE = 1 yes YES true TRUE
@@ -34,7 +34,7 @@ check: TEST_GEN
 	@printf "Running test binaries \n\n"
 	-$(foreach bin, $(TEST_BINARIES), ./$(bin) ; )
 	@printf "\nDone running tests\n"
-	$(MAKE) testclean > /dev/null
+	$(MAKE) cleantest > /dev/null
 ##########################################################################################
 
 test_compile: $(TEST_OBJECTS) $(TEST_BIN_OBJS) $(TEST_BINARIES)
@@ -48,7 +48,7 @@ test_compile: $(TEST_OBJECTS) $(TEST_BIN_OBJS) $(TEST_BINARIES)
 test/%.ocxx: test/%.h.cpp
 	$(TEST_CC) -c $(TEST_CFLAGS) $(IFLAGS) -o $@ $<
 
-testclean:
+cleantest:
 	rm -f $(addsuffix .cpp, $(TEST_HEADERS))
 	rm -f $(addsuffix .test, $(TEST_BIN_OBJS))
 	rm -f $(TEST_OBJECTS) $(TEST_BIN_OBJS) $(TEST_BINARIES)

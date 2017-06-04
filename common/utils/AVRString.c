@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <inttypes.h>
 
 void AVRStringRefineString(char * buffer)
 {
@@ -67,4 +68,21 @@ void AVRStrinStripExtraSpace(char* str) {
     if(!isspace(str[i]) || (i>0 && !isspace(str[i-1])))
       str[x++] = str[i];
   str[x] = '\0';
+}
+
+void AVRStringRemoveChar(char * str, char c)
+{
+	uint8_t i, new_i;
+	new_i = 0;
+
+	for (i = 0; i < strlen(str); ++i)
+	{
+		if (str[i] != c)
+		{
+			str[new_i] = str[i];
+			++new_i;
+		}
+	}
+
+	str[new_i] = '\0';
 }

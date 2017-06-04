@@ -10,13 +10,13 @@ Note: this repo doesn't support Arduino IDE. Everything must be run from Makefil
         +---test/                               - all component testers go here, test code uses no os
         +---os/                                 - optional RTOS (currently ChibiOS)
         |       +---ChibiOS/                    - 
-        +---c-project/                          - skeleton  for C based projects using avr-gcc
+        +---c-project/                          - skeleton for C based projects using avr-gcc
         |       +---with-os/                    -
         |       +---without-os/                 -
-        +---cpp-project/                        - skeleton  for C++ based projects using avr-g++
+        +---cpp-project/                        - skeleton for C++ based projects using avr-g++
         |       +---with-os/                    -
         |       +---without-os/                 -
-        +---doc                                 - documentations
+        +---doc                                 - documentations about arduino and modules
         +---common/                             - includes common/unit test makefiles for all projects
         |       +---utils/                      - common protocols such as soft serial, i2c, debugging
 	
@@ -29,9 +29,10 @@ Note: this repo doesn't support Arduino IDE. Everything must be run from Makefil
         go to test/ to checkout individual module test code, all code here must be in C except cxxtest headers
 
 # Completed projects
-        +--c-project/without-os/GPS-breakout-board      - i2c console app for arduino, this tool makes i2c debug easier
-        +--c-project/without-os/i2c-console             - gps tracker app that shows parsed distance/angle to lcd and serial port 
-	
+        +--c-project/without-os/GPS-breakout-board      - gps tracker app that shows parsed distance/angle to lcd and serial port
+        +--c-project/without-os/i2c-console             - i2c console app for arduino, this tool makes i2c debug easier 
+        +--c-project/without-os/serial-calculator       - simple calculator via serial port, supports +-*/() and unsigned number
+
 # Question & Bug fix?
         Please email author tdpham1105@yahoo.com
         Or file issue via github

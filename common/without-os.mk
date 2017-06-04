@@ -8,8 +8,9 @@ TTY	  ?= /dev/ttyACM0
 PROGRAMMER = -c arduino -P $(TTY) -b 115200
 FUSES      = -U hfuse:w:0xd9:m -U lfuse:w:0xe0:m
 
-# OS specific
+# Directory path
 OS_DIR     = $(TOP)/os/ChibiOS/
+UTILS_DIR  = $(TOP)/common/utils/
 ###########################################################################
 CC ?=avr-gcc
 BINARY_NAME ?=main.elf

@@ -16,11 +16,12 @@
 
 #define SERIALDEBUG_DEFAULT_BAUD	57600 // default baud rate when calling SerialDebugInit()
 
+#ifndef LOG
 #ifdef DEBUG
 #ifndef CXXTEST
-char __msg[128];
+
 #define LOG(msg, arg...) \
-	{  \
+	{  char __msg[STRING_MAXLEN];\
 	snprintf(__msg, STRING_MAXLEN, msg, ##arg);\
 	SerialDebugPrint("%s:%d - (%d)\t%s", __FILE__, __LINE__, freeMemory(), __msg); \
 	}
@@ -39,6 +40,8 @@ char __msg[128];
 #define TRACE_INT(var) LOG("[%s] = %d", #var, var);
 #define TRACE_STRING(var) LOG("[%s] = %s", #var, var);
 
+#endif
+
 /*
  * Init serial port, use default baud rate
  */
@@ -49,20 +52,21 @@ void SerialDebugInit(void);
  */
 void SerialDebugInitWithBaudRate(unsigned baudrate);
 
+#ifndef SerialDebugPrint
 /*
  * Printf to serial port
  */
-char _msg[STRING_MAXLEN];
 #define SerialDebugPrint(arg...) \
-{ 	\
+{ 	char _msg[STRING_MAXLEN];\
 	snprintf(_msg, STRING_MAXLEN, ##arg); \
 	_SerialDebugPrint1(_msg); \
 }
 #define SerialDebugPrintNoEndl(arg...) \
-{ 	\
+{ 	char _msg[STRING_MAXLEN];\
 	snprintf(_msg, STRING_MAXLEN, ##arg); \
 	_SerialDebugPrintNoEndl(_msg); \
 }
+#endif
 void _SerialDebugPrint1(const char* message);
 void _SerialDebugPrintNoEndl(const char* message);
 

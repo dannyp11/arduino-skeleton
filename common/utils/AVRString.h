@@ -10,7 +10,11 @@
 #ifndef UTILS_AVRSTRING_H_
 #define UTILS_AVRSTRING_H_
 
+#ifdef DEBUG
 #define STRING_MAXLEN	80 // max string length for all strings
+#else
+#define STRING_MAXLEN	128 // max string length for all strings
+#endif
 
 /**
  * process string with backspace support
@@ -30,7 +34,7 @@ void AVRStringRefineString(char * buffer);
  that pointer with the returned value, since the original pointer must be
  deallocated using the same allocator with which it was allocated.  The return
  value must NOT be deallocated using free() etc.
- *TLDR: str will be modified in length so be careful about dealloc it
+ *TLDR: str will be modified in pointer so be careful about dealloc it
  *
  * @param str
  * @return
@@ -43,5 +47,13 @@ char * AVRStringTrimWhiteSpace(char *str);
  * @param str
  */
 void AVRStrinStripExtraSpace(char* str);
+
+/**
+ * Remove c in str
+ *
+ * @param str - input string
+ * @param c - character to be removed
+ */
+void AVRStringRemoveChar(char * str, char c);
 
 #endif /* UTILS_AVRSTRING_H_ */
