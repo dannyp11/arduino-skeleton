@@ -1,6 +1,10 @@
 # TEST_SOURCES: source files to be tested
 # TEST_HEADERS: header file for test cases in cxxtest framework, must be test/*Test.h
 
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+MKFILE_DIRNAME := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
+TOP :=$(shell dirname $(MKFILE_PATH))/../
+
 TEST_SOURCES ?=
 TEST_HEADERS ?= $(wildcard test/*Test.h) 
 TEST_CC =clang++

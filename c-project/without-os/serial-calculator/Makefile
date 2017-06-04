@@ -4,6 +4,7 @@ CFLAGS = -Wextra
 DEBUG = yes
 FLOAT_SUPPORT = no # support printf, sscanf floats
 UTILS_SUPPORT = yes # extra utils such as soft serial, i2c, serial debug
+HEX_NAME = simple-calculator.hex
 
 # required
 TOP = ../../../

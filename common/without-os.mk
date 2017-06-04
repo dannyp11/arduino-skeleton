@@ -1,4 +1,6 @@
-TOP		   ?= ${CURDIR}/..
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+MKFILE_DIRNAME := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
+TOP :=$(shell dirname $(MKFILE_PATH))/../
 
 # Arduino specific
 DEVICE     = atmega328p
@@ -14,6 +16,7 @@ UTILS_DIR  = $(TOP)/common/utils/
 ###########################################################################
 CC ?=avr-gcc
 BINARY_NAME ?=main.elf
+HEX_NAME ?=$(MKFILE_DIRNAME).hex
 TRUE = 1 yes YES true TRUE
 
 ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),) # check if UTILS_SUPPORT is 1|yes|YES
@@ -61,9 +64,10 @@ COMPILE = $(CC) $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(IFLAGS)
 # symbolic targets:
 .default: all
 
-all:	clean
-	$(MAKE) main.hex
-	
+all: clean
+	echo $(shell dirname $(MKFILE_PATH))
+	echo $(MKFILE_DIRNAME)
+	$(MAKE) $(HEX_NAME)	
 	
 .c.o:
 	$(COMPILE) -c $< -o $@
@@ -85,7 +89,7 @@ all:	clean
 	$(COMPILE) -S $< -o $@
 
 flash:	all
-	$(AVRDUDE) -U flash:w:main.hex:i
+	$(AVRDUDE) -U flash:w:$(HEX_NAME):i
 
 fuse:
 	$(AVRDUDE) $(FUSES)
@@ -95,18 +99,18 @@ install: flash fuse
 
 # if you use a bootloader, change the command below appropriately:
 load: all
-	bootloadHID main.hex
+	bootloadHID $(HEX_NAME)
 
 clean: 
-	rm -f main.hex $(BINARY_NAME) $(OBJECTS)
+	rm -f $(HEX_NAME) $(BINARY_NAME) $(OBJECTS)
 
 # file targets:
 $(BINARY_NAME): $(OBJECTS)
 	$(COMPILE) -o $(BINARY_NAME) $(OBJECTS)
 
-main.hex: $(BINARY_NAME)
-	rm -f main.hex
-	avr-objcopy -j .text -j .data -O ihex $(BINARY_NAME) main.hex
+$(HEX_NAME): $(BINARY_NAME)
+	rm -f $(HEX_NAME)
+	avr-objcopy -j .text -j .data -O ihex $(BINARY_NAME) $(HEX_NAME)
 	avr-size -C $(BINARY_NAME)
 # If you have an EEPROM section, you must also create a hex file for the
 # EEPROM and add it to the "flash" target.
