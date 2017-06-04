@@ -32,11 +32,11 @@ TEST_GEN:
 
 ifneq ($(filter $(BRIEF), $(TRUE)),) # check if compile message should be output, BRIEF means no
 check: 
-	$(MAKE) TEST_GEN > /dev/null 
+	@$(MAKE) TEST_GEN > /dev/null 
 	@printf "Running test binaries \n\n"
 	-$(foreach bin, $(TEST_BINARIES), ./$(bin) ; )
 	@printf "\nDone running tests\n"
-	$(MAKE) cleantest > /dev/null
+	@$(MAKE) cleantest > /dev/null
 else
 check: TEST_GEN 
 	@printf "Running test binaries \n\n"
