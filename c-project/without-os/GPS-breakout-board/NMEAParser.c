@@ -61,7 +61,7 @@ uint8_t checkSum(const char * message)
 	int expectedCkSum;
 	sscanf(token, "*%x", &expectedCkSum);
 
-	int i;
+	size_t i;
 	int actualCksum = 0;
 	for (i = 0; i < strlen(target); ++i)
 	{
@@ -131,7 +131,7 @@ uint8_t parseGGA(const char * message, NMEAData * result, uint8_t errcode)
 			else
 			{
 				result->location.lat_deg = (int) (lat / 100.0f + 0.5f);
-				result->location.lat_min = (float) (lat
+				result->location.lat_min = (double) (lat
 						- 100.0 * result->location.lat_deg);
 			}
 		}
@@ -163,7 +163,7 @@ uint8_t parseGGA(const char * message, NMEAData * result, uint8_t errcode)
 			else
 			{
 				result->location.lon_deg = (int) (lon / 100.0f + 0.5f);
-				result->location.lon_min = (float) (lon
+				result->location.lon_min = (double) (lon
 						- 100.0 * result->location.lon_deg);
 			}
 		}
@@ -250,7 +250,7 @@ uint8_t parseRMC(const char * message, NMEAData * result, uint8_t errcode)
 			else
 			{
 				result->location.lat_deg = (int) (lat / 100.0f + 0.5f);
-				result->location.lat_min = (float) (lat
+				result->location.lat_min = (double) (lat
 						- 100.0 * result->location.lat_deg);
 			}
 		}
@@ -282,7 +282,7 @@ uint8_t parseRMC(const char * message, NMEAData * result, uint8_t errcode)
 			else
 			{
 				result->location.lon_deg = (int) (lon / 100.0f + 0.5f);
-				result->location.lon_min = (float) (lon
+				result->location.lon_min = (double) (lon
 						- 100.0 * result->location.lon_deg);
 			}
 		}
@@ -306,7 +306,7 @@ uint8_t parseRMC(const char * message, NMEAData * result, uint8_t errcode)
 
 		case RMC_SPEED:
 		{
-			if (sscanf(token_str, "%f", &result->speed) != 1)
+			if (sscanf(token_str, "%lf", &result->speed) != 1)
 				errcode = 1;
 		}
 			break;
@@ -378,9 +378,9 @@ uint8_t NMEAParserParseString(const char * message, NMEAData * result)
 	return retVal;
 }
 
-inline float toRadian(int degree, float min)
+inline double toRadian(int degree, double min)
 {
-	return (((float) degree + min / 60.0) * M_PI) / 180.0;
+	return (((double) degree + min / 60.0) * M_PI) / 180.0;
 }
 
 /**
@@ -389,41 +389,41 @@ inline float toRadian(int degree, float min)
  * @param b
  * @return
  */
-float NMEAGetDistance(const NMEALocation * a, const NMEALocation * b)
+double NMEAGetDistance(const NMEALocation * a, const NMEALocation * b)
 {
-	float retVal = -1;
+	double retVal = -1;
 
-	float lata = toRadian(a->lat_deg, a->lat_min);
-	float lona = toRadian(a->lon_deg, a->lon_min);
-	float latb = toRadian(b->lat_deg, b->lat_min);
-	float lonb = toRadian(b->lon_deg, b->lon_min);
+	double lata = toRadian(a->lat_deg, a->lat_min);
+	double lona = toRadian(a->lon_deg, a->lon_min);
+	double latb = toRadian(b->lat_deg, b->lat_min);
+	double lonb = toRadian(b->lon_deg, b->lon_min);
 
-	float R = 6371000.0f;
-	float dlat = (latb - lata);
-	float dlon = (lonb - lona);
+	double R = 6371000.0f;
+	double dlat = (latb - lata);
+	double dlon = (lonb - lona);
 
-	float fa = sin(dlat/2) * sin(dlat/2) + cos(lata) * cos(latb) * sin (dlon/2) * sin(dlon/2);
-	float fc = 2 * atan2(sqrt(fa), sqrt(1-fa));
+	double fa = sin(dlat/2) * sin(dlat/2) + cos(lata) * cos(latb) * sin (dlon/2) * sin(dlon/2);
+	double fc = 2 * atan2(sqrt(fa), sqrt(1-fa));
 	retVal = fc * R;
 
 	return retVal;
 }
 
-float NMEAGetAngle(const NMEALocation * a, const NMEALocation * b)
+double NMEAGetAngle(const NMEALocation * a, const NMEALocation * b)
 {
-	float retVal = -1;
+	double retVal = -1;
 
-	float lata = toRadian(a->lat_deg, a->lat_min);
-	float lona = toRadian(a->lon_deg, a->lon_min);
-	float latb = toRadian(b->lat_deg, b->lat_min);
-	float lonb = toRadian(b->lon_deg, b->lon_min);
+	double lata = toRadian(a->lat_deg, a->lat_min);
+	double lona = toRadian(a->lon_deg, a->lon_min);
+	double latb = toRadian(b->lat_deg, b->lat_min);
+	double lonb = toRadian(b->lon_deg, b->lon_min);
 
-	float dlat = (latb - lata);
-	float dlon = (lonb - lona);
+	double dlat = (latb - lata);
+	double dlon = (lonb - lona);
 
-	float y = sin(dlon) * cos(latb);
-	float x = cos(lata) * sin(latb) - sin(lata) * cos(latb) * cos(dlon);
-	float bearing = atan2(y, x);
+	double y = sin(dlon) * cos(latb);
+	double x = cos(lata) * sin(latb) - sin(lata) * cos(latb) * cos(dlon);
+	double bearing = atan2(y, x);
 
 	bearing = bearing * 180.0 / M_PI;
 	bearing *= -1;

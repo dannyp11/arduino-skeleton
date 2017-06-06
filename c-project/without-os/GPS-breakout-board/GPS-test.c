@@ -16,7 +16,7 @@ int main(void)
 {
 	LCDInit();
 	SerialDebugInitWithBaudRate(9600);
-	float distance = 0.0f;
+	double distance = 0.0f;
 	NMEAData initLocation, prevData;
 	initLocation.isValid = 0;
 
@@ -51,26 +51,26 @@ int main(void)
 		if (gpsData.isValid && parseResult == 0)
 		{
 			SerialDebugPrint("Parse succeeds, message %s", gps_msg);
-			SerialDebugPrint("lat %d %f", gpsData.location.lat_deg,
+			SerialDebugPrint("lat %d %lf", gpsData.location.lat_deg,
 					gpsData.location.lat_min);
-			SerialDebugPrint("lon %d %f", gpsData.location.lon_deg,
+			SerialDebugPrint("lon %d %lf", gpsData.location.lon_deg,
 					gpsData.location.lon_min);
 
 			distance += NMEAGetDistance(&prevData.location, &gpsData.location);
-			SerialDebugPrint("traveled distance %.2f m", distance);
+			SerialDebugPrint("traveled distance %.2lf m", distance);
 
-			float angle = NMEAGetAngle(&initLocation.location, &gpsData.location);
-			SerialDebugPrint("angle from initial location %.2f degrees", angle);
+			double angle = NMEAGetAngle(&initLocation.location, &gpsData.location);
+			SerialDebugPrint("angle from initial location %.2lf degrees", angle);
 
-			float distanceToInitPlace = NMEAGetDistance(&initLocation.location, &gpsData.location);
-			SerialDebugPrint(" %4.0f m to initial place", distanceToInitPlace);
+			double distanceToInitPlace = NMEAGetDistance(&initLocation.location, &gpsData.location);
+			SerialDebugPrint(" %4.0lf m to initial place", distanceToInitPlace);
 
 			SerialDebugPrint(" ");
 
 			LCDSetCursor(1,0);
-			LCDPrint("traveled %.2f m", distance);
+			LCDPrint("traveled %.2lf m", distance);
 			LCDSetCursor(2,0);
-			LCDPrint("angle %.2f degrees", angle);
+			LCDPrint("angle %.2lf degrees", angle);
 			LCDSetCursor(3,0);
 			LCDPrint("%4.0f m to init place", distanceToInitPlace);
 

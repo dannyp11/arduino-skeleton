@@ -13,7 +13,7 @@
 typedef struct _NMEALocation
 {
 	int lat_deg, lon_deg; // degree sign + for N, E, - for S, W
-	float lat_min, lon_min;
+	double lat_min, lon_min;
 } NMEALocation;
 
 typedef struct _NMEAData
@@ -21,7 +21,7 @@ typedef struct _NMEAData
 	NMEALocation location;
 	int timestamp; // military time hhmmss
 	unsigned date; // format ddmmyy
-	float speed; // in knot
+	double speed; // in knot
 	uint8_t isValid;
 } NMEAData;
 
@@ -51,7 +51,7 @@ uint8_t NMEAParserParseString(const char * message, NMEAData * result);
  * @return 	distance on success
  * 			-1 on fail
  */
-float NMEAGetDistance(const NMEALocation * a, const NMEALocation * b);
+double NMEAGetDistance(const NMEALocation * a, const NMEALocation * b);
 
 /**
  * Get angle in degree compared to North CCW
@@ -61,6 +61,6 @@ float NMEAGetDistance(const NMEALocation * a, const NMEALocation * b);
  * @return angle
  * 			-1 on fail
  */
-float NMEAGetAngle(const NMEALocation * a, const NMEALocation * b);
+double NMEAGetAngle(const NMEALocation * a, const NMEALocation * b);
 
 #endif /* TEST_GPS_BREAKOUT_BOARD_NMEAPARSER_H_ */
