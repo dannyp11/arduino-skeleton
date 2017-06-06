@@ -1,11 +1,5 @@
 # to program to arduino, type make flash
-CC=avr-gcc
-CFLAGS =
-TOP = ../../
 
-# required
-SOURCES = $(wildcard *.c)
-INCLUDES = ./
+# always include skeleton.mk
+include ../../common/skeleton.mk
 
-# specify your preferred .mk file
-include ../../common/without-os.mk

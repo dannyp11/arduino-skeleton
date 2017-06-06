@@ -17,16 +17,18 @@ Note: this repo doesn't support Arduino IDE. Everything must be run from Makefil
         |       +---with-os/                    -
         |       +---without-os/                 -
         +---doc                                 - documentations about arduino and modules
-        +---common/                             - includes common/unit test makefiles for all projects
+        +---common/                             - includes common mkfile (skeleton.mk) for all projects
         |       +---utils/                      - common protocols such as soft serial, i2c, debugging
+        |       +---makefiles/                  - specific mk files for individual project options
 	
 # UnitTest framework (Software)
         This repo supports cxxtest framework, run make check will invoke testgen and run the test binary
-        Put all test headers in test directory of project directory, see test/GPS-breakout-board for example
+        Put all test headers in test directory of project directory, see c-project/without-os/GPS-breakout-board for example
 
 # Usage
         go to c*-project/with*-os/ directory and use its makefile
         go to test/ to checkout individual module test code, all code here must be in C except cxxtest headers
+        note: always include common/skeleton.mk inside project makefile, then run make help to view variables
 
 # Completed projects
         +--c-project/without-os/GPS-breakout-board      - gps tracker app that shows parsed distance/angle to lcd and serial port

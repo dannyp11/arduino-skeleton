@@ -1,29 +1,9 @@
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIRNAME := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
-TOP :=$(shell dirname $(MKFILE_PATH))/../
-
-# Arduino specific
-DEVICE     = atmega328p
-CLOCK      = 16000000
-TTY	  ?= /dev/ttyACM0
-#PROGRAMMER = -c usbtiny -P usb
-PROGRAMMER = -c arduino -P $(TTY) -b 115200
+TOP :=$(shell dirname $(MKFILE_PATH))/../../
 FUSES      = -U hfuse:w:0xd9:m -U lfuse:w:0xe0:m
 
-# Directory path
-OS_DIR     = $(TOP)/os/ChibiOS/
-UTILS_DIR  = $(TOP)/common/utils/
-###########################################################################
-CC ?=avr-gcc
-BINARY_NAME ?=main.elf
-HEX_NAME ?=$(MKFILE_DIRNAME).hex
-TRUE = 1 yes YES true TRUE
-
-ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),) # check if UTILS_SUPPORT is 1|yes|YES
-SOURCES	  += $(wildcard $(TOP)/common/utils/*.c)
-INCLUDES  += $(TOP)/common/utils/ 
-endif
-
+# generate object names
 OBJECTS	 = $(patsubst %.cpp, %.o, $(SOURCES))
 OBJECTS	 += $(patsubst %.c, %.o, $(SOURCES))
 OBJECTS  := $(filter-out %.c, $(OBJECTS))
@@ -31,14 +11,6 @@ OBJECTS  := $(filter-out %.cpp, $(OBJECTS))
 
 IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
 CFLAGS  += -Wall -Os 
-
-ifneq ($(filter $(DEBUG), $(TRUE)),) # check if -DDEBUG should be added
-CFLAGS  += -DDEBUG=1
-endif
-
-ifneq ($(filter $(FLOAT_SUPPORT), $(TRUE)),) # check if FLOAT_SUPPORT is 1|yes|YES
-CFLAGS  += -Wl,-u,vfprintf -lprintf_flt -Wl,-u,vfscanf -lscanf_flt -lm # printf scanf float support
-endif
 
 # Fuse Low Byte = 0xe0   Fuse High Byte = 0xd9   Fuse Extended Byte = 0xff
 # Bit 7: CKDIV8  = 0     Bit 7: RSTDISBL  = 1    Bit 7:
@@ -65,8 +37,6 @@ COMPILE = $(CC) $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(IFLAGS)
 .default: all
 
 all: clean
-	echo $(shell dirname $(MKFILE_PATH))
-	echo $(MKFILE_DIRNAME)
 	$(MAKE) $(HEX_NAME)	
 	
 .c.o:
@@ -118,6 +88,3 @@ $(HEX_NAME): $(BINARY_NAME)
 # Targets for code debugging and analysis:
 disasm:	$(BINARY_NAME)
 	avr-objdump -d $(BINARY_NAME)
-
-cpp:
-	$(COMPILE) -E main.c

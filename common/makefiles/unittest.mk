@@ -3,18 +3,7 @@
 
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIRNAME := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
-TOP :=$(shell dirname $(MKFILE_PATH))/../
-
-TEST_SOURCES ?=
-TEST_HEADERS ?= $(wildcard test/*Test.h) 
-TEST_CC =clang++
-TEST_CFLAGS += -g -O0 -Wall -Wextra -DCXXTEST=1
-IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
-
-TRUE = 1 yes YES true TRUE
-ifneq ($(filter $(TEST_DEBUG), $(TRUE)),) # check if -DDEBUG should be added
-TEST_CFLAGS  += -DDEBUG=1
-endif
+TOP :=$(shell dirname $(MKFILE_PATH))/../../
 
 # test objects definition
 TEST_OBJECTS	= $(patsubst %.cpp, %.ocxx, $(TEST_SOURCES))
@@ -27,6 +16,8 @@ TEST_BIN_OBJS	=  $(patsubst %.h, %.ocxx, $(TEST_HEADERS))
 TEST_BIN_OBJS  	:= $(filter-out %.h, $(TEST_BIN_OBJS))
 
 TEST_BINARIES	= $(patsubst %.h, %.cxxtest, $(TEST_HEADERS))
+
+IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
 
 # main rules to run
 ##########################################################################################

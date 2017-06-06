@@ -57,7 +57,7 @@ TARGET = ch
 OBJDIR = .
 
 # Imported source files
-CHIBIOS ?= ../os/ChibiOS
+CHIBIOS ?= ../../os/ChibiOS
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/hal/boards/ARDUINO_UNO/board.mk
 include $(CHIBIOS)/os/hal/ports/AVR/platform.mk
@@ -108,7 +108,8 @@ DEBUG = dwarf-2
 EXTRAINCDIRS = $(CHIBIOS)/os/license $(PORTINC) $(KERNINC) $(TESTINC) \
                $(HALINC) $(OSALINC) $(PLATFORMINC) \
                $(CHIBIOS)/os/hal/lib/streams \
-               $(BOARDINC) $(CHIBIOS)/os/various $(foreach d, $(INCLUDES), -I$d)
+               $(BOARDINC) $(CHIBIOS)/os/various \
+               $(foreach d, $(INCLUDES), -I$d)
 
 # Compiler flag to set the C Standard level.
 #     c89   = "ANSI" C

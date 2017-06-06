@@ -6,10 +6,11 @@ INCLUDES = ./
 
 # unit test files
 # remember to put cxx test headers in test/*Test.h
+UNITTEST_SUPPORT = yes
 TEST_SOURCES = AVRString.c
 TEST_DEBUG = no
 TEST_CFLAGS = -std=gnu++0x
 
-# specify your preferred .mk file
-include $(TOP)/common/unittest.mk
+# always include skeleton.mk
+include $(TOP)/common/skeleton.mk
 

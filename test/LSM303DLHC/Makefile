@@ -1,10 +1,10 @@
 # to program to arduino, type make flash
-CC=avr-gcc
 CFLAGS =  -DNOCHIBI=1
+UTILS_SUPPORT = true
 
 # required
-SOURCES = $(wildcard *.c) ../serial-port/SerialDebug.c
-INCLUDES = ./ ../serial-port/
+SOURCES = $(wildcard *.c)
+INCLUDES = ./
 
-# specify your preferred .mk file
-include ../../common/without-os.mk
+# always include skeleton.mk
+include ../../common/skeleton.mk

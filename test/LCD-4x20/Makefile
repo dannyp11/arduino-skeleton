@@ -1,15 +1,11 @@
 # to program to arduino, type make flash
-CC=avr-gcc
 CFLAGS = -O0
-TOP = ../../
+UTILS_SUPPORT=yes
 
 # required
 SOURCES = $(wildcard *.c)
 INCLUDES = ./ 
 
-# extra utils such as soft serial, i2c
-SOURCES	  += $(wildcard $(TOP)/common/utils/*.c)
-INCLUDES  += $(TOP)/common/utils/ 
+# always include skeleton.mk
+include ../../common/skeleton.mk
 
-# specify your preferred .mk file
-include ../../common/without-os.mk

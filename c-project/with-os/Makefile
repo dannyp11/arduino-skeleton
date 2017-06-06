@@ -1,7 +1,10 @@
+# type make program to flash into device
+WITH_OS = true
+
+# required
 SOURCES = $(wildcard *.c)
 INCLUDES = ./
 
 
-# specify os path
-CHIBIOS = ../../os/ChibiOS/
-include ../../common/with-chibios.mk
+# always include skeleton.mk
+include ../../common/skeleton.mk
