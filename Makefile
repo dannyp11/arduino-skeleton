@@ -7,12 +7,14 @@ TOP = ./
 check:
 	$(TOP)/project_manager.sh -k test/
 	$(TOP)/project_manager.sh -k c-project/
+	$(TOP)/project_manager.sh -k cpp-project/
 	$(TOP)/project_manager.sh -k common/
         
 # clean all projects for maintaining purpose
 clean:
 	$(TOP)/project_manager.sh -c test/
 	$(TOP)/project_manager.sh -c c-project/
+	$(TOP)/project_manager.sh -c cpp-project/
 
 # show readme file
 readme info:

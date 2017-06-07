@@ -3,19 +3,20 @@ This is the first embarkment of my learning experience & side projects. Let's se
 
 Skeleton framework for Arduino with/without RTOS, uses avr gcc/ g++
 
-Currently works with Unix system
-Note: this repo doesn't support Arduino IDE. Everything must be run from Makefile, because of reason
+Currently works with Unix system, compatible with Arduino framework (setup/loop)
+Note: this repo now supports Arduino IDE, only need to set IDE_SUPPORT to true from skeleton.mk
 
 # Directory Structure
         +---test/                               - all component testers go here, test code uses no os
         +---os/                                 - optional RTOS (currently ChibiOS)
         |       +---ChibiOS/                    - 
-        +---c-project/                          - skeleton for C based projects using avr-gcc
+        +---c-project/                          - skeleton for C based projects
         |       +---with-os/                    -
         |       +---without-os/                 -
-        +---cpp-project/                        - skeleton for C++ based projects using avr-g++
+        +---cpp-project/                        - skeleton for C++ based projects
         |       +---with-os/                    -
         |       +---without-os/                 -
+        |       +---with-ide/                   -
         +---doc                                 - documentations about arduino and modules
         +---common/                             - includes common mkfile (skeleton.mk) for all projects
         |       +---utils/                      - common protocols such as soft serial, i2c, debugging
@@ -38,4 +39,16 @@ Note: this repo doesn't support Arduino IDE. Everything must be run from Makefil
 # Question & Bug fix?
         Please email author tdpham1105@yahoo.com
         Or file issue via github
+
+# Release Note
+* DONE v1.0.0 - all-C projects
+  + I2C console via serial port: make I2C debugging easier
+  + GPS NMEA data parser with LCD: track walked distance & position compared to initial one
+  + Simple calculator via serial port, supports +-*/() and non negative numbers
+
+* TODO v2.0.0 - matured C support & new mk files structure
+  + Software Serial C support upto baud 9600 for RX, 115200 for TX
+  + Support Arduino IDE framework
+  + Build core & skeleton library
+  + skeleton.mk is one-stop .mk for all projects, include it at the end of project's makefile
 

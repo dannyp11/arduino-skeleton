@@ -3,14 +3,21 @@ MKFILE_DIRNAME := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
 TOP :=$(shell dirname $(MKFILE_PATH))/../../
 FUSES      = -U hfuse:w:0xd9:m -U lfuse:w:0xe0:m
 
+# default variable values
+SOURCES ?= $(wildcard *.c) $(wildcard *.cpp)
+INCLUDES ?= ./
+
 # generate object names
 OBJECTS	 = $(patsubst %.cpp, %.o, $(SOURCES))
 OBJECTS	 += $(patsubst %.c, %.o, $(SOURCES))
 OBJECTS  := $(filter-out %.c, $(OBJECTS))
 OBJECTS  := $(filter-out %.cpp, $(OBJECTS))
 
+OBJ_DIR  = tmp/
+OBJ_TMP  = $(addprefix $(OBJ_DIR)/, $(notdir ${OBJECTS}))
+
 IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
-CFLAGS  += -Wall -Os 
+CFLAGS  += -Wall -Os -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=106
 
 # Fuse Low Byte = 0xe0   Fuse High Byte = 0xd9   Fuse Extended Byte = 0xff
 # Bit 7: CKDIV8  = 0     Bit 7: RSTDISBL  = 1    Bit 7:
@@ -32,31 +39,20 @@ CFLAGS  += -Wall -Os
 
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
 COMPILE = $(CC) $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(IFLAGS)
+COMPILE_CPP = $(CPP) $(CPPFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(IFLAGS)
 
 # symbolic targets:
 .default: all
 
 all: clean
+	@mkdir -p $(OBJ_DIR)
 	$(MAKE) $(HEX_NAME)	
 	
 .c.o:
-	$(COMPILE) -c $< -o $@
+	$(COMPILE) -c $< -o $(OBJ_DIR)/$(notdir $@)
 
 .cpp.o:
-	$(COMPILE) -c $< -o $@
-
-.S.o:
-	$(COMPILE) -x assembler-with-cpp -c $< -o $@
-# "-x assembler-with-cpp" should not be necessary since this is the default
-# file type for the .S (with capital S) extension. However, upper case
-# characters are not always preserved on Windows. To ensure WinAVR
-# compatibility define the file type manually.
-
-.c.s:
-	$(COMPILE) -S $< -o $@
-
-.cpp.s:
-	$(COMPILE) -S $< -o $@
+	$(COMPILE_CPP) -c $< -o $(OBJ_DIR)/$(notdir $@)
 
 flash:	all
 	$(AVRDUDE) -U flash:w:$(HEX_NAME):i
@@ -72,11 +68,12 @@ load: all
 	bootloadHID $(HEX_NAME)
 
 clean: 
-	rm -f $(HEX_NAME) $(BINARY_NAME) $(OBJECTS)
+	rm -f $(HEX_NAME) $(BINARY_NAME)
+	rm -rf $(OBJ_DIR)
 
 # file targets:
 $(BINARY_NAME): $(OBJECTS)
-	$(COMPILE) -o $(BINARY_NAME) $(OBJECTS)
+	$(COMPILE) -o $(BINARY_NAME) $(OBJ_TMP)
 
 $(HEX_NAME): $(BINARY_NAME)
 	rm -f $(HEX_NAME)

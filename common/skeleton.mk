@@ -18,6 +18,7 @@ PROGRAMMER = -c arduino -P $(TTY) -b 115200
 OS_DIR     = $(TOP)/os/ChibiOS/
 UTILS_DIR  = $(TOP)/common/utils/
 MKFILES_DIR = $(TOP)/common/makefiles/
+AVR_DIR     ?= /usr/share/arduino/
 
 # Project types #####################################################################
 CPP_PROJECT ?= no
@@ -25,7 +26,9 @@ WITH_OS ?= no # currently support chibios
 
 # Compiler config ##################################################################
 PROJECT_NAME ?= main
-CC ?=avr-gcc
+CC=avr-gcc
+CPP=avr-g++
+AR ?=avr-ar
 BINARY_NAME=$(PROJECT_NAME).elf
 HEX_NAME=$(PROJECT_NAME).hex
 SOURCES ?= $(wildcard *.c) $(wildcard *.cpp)
@@ -35,6 +38,16 @@ UNITTEST_SUPPORT ?= no
 UTILS_SUPPORT ?= no
 FLOAT_SUPPORT ?= no
 DEBUG ?= no
+IDE_SUPPORT ?= no
+
+ifneq ($(filter $(IDE_SUPPORT), $(TRUE)),) # check if arduino ide library is supported, force using c++ if true
+CPP_PROJECT = yes
+WITH_OS = no
+INCLUDES += $(AVR_DIR)hardware/arduino/cores/arduino/ $(AVR_DIR)hardware/arduino/variants/standard/
+SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/*.cpp)
+SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/*.c)
+SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/avr-libc/*.c)
+endif
 
 ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),) # check if UTILS_SUPPORT is 1|yes|YES
 SOURCES	  += $(wildcard $(UTILS_DIR)/*.c)
@@ -50,10 +63,8 @@ CFLAGS  += -Wl,-u,vfprintf -lprintf_flt -Wl,-u,vfscanf -lscanf_flt -lm # printf 
 endif
 
 ifneq ($(filter $(CPP_PROJECT), $(TRUE)),)
-CC=avr-g++
-CFLAGS += -Wno-write-strings
-else
-CC=avr-gcc
+CPPFLAGS := $(CFLAGS)
+CPPFLAGS += -Wno-write-strings -fno-exceptions
 endif
 
 ifneq ($(filter $(WITH_OS), $(TRUE)),) # include with-os.mk
@@ -87,15 +98,18 @@ Device          DEVICE          uController chip                $(DEVICE)
                 PROGRAMMER      type of uController programmer  $(PROGRAMMER)
 
 Project         CPP_PROJECT     is C++ project?                 $(CPP_PROJECT)  
-                WITH_OS         uses ChibiOS?                   $(WITH_OS)      
-        
-Compiler        PROJECT_NAME    name of project                 $(PROJECT_NAME)
-                *SOURCES        all .c and .cpp files           $(SOURCES)
-                *INCLUDES       list of directories to include  $(INCLUDES)
-                CC              avr gcc path                    $(CC)
+                WITH_OS         uses ChibiOS?                   $(WITH_OS)
                 UTILS_SUPPORT   utils such as i2c, debug, etc.  $(UTILS_SUPPORT)
                 FLOAT_SUPPORT   support float printf/scanf      $(FLOAT_SUPPORT)
+                IDE_SUPPORT     support ide lib (setup, loop)?  $(IDE_SUPPORT)
+                DEBUG           add -DDEBUG=1 to cflags         $(DEBUG)
+                AVR_DIR         path to installed library       $(AVR_DIR)
+        
+Compiler        PROJECT_NAME    name of project                 $(PROJECT_NAME)
                 CFLAGS          add to cflag of avr gcc         $(CFLAGS)
+                CPPFLAGS	add to c++ flags of avr g++	$(CPPFLAGS)
+                *INCLUDES       list of directories to include  $(INCLUDES)
+                *SOURCES        all .c and .cpp files           $(SOURCES)
 
 SW Unittest     UNITTEST_SUPPORT                                $(UNITTEST_SUPPORT) 
                 TEST_SOURCES    files to be tested              $(TEST_SOURCES)
