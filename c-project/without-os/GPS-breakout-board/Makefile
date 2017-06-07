@@ -2,7 +2,7 @@
 CFLAGS = 
 FLOAT_SUPPORT = YES # support printf, sscanf floats
 UTILS_SUPPORT = YES # extra utils such as soft serial, i2c, serial debug
-PROJECT_NAME = GPS-breakout-board.hex
+PROJECT_NAME = GPS-breakout-board
 TOP = ../../../
 
 # required

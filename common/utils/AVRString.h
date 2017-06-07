@@ -11,7 +11,7 @@
 #define UTILS_AVRSTRING_H_
 
 #ifdef DEBUG
-#define STRING_MAXLEN	80 // max string length for all strings
+#define STRING_MAXLEN	256 // max string length for all strings
 #else
 #define STRING_MAXLEN	128 // max string length for all strings
 #endif

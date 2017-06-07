@@ -52,6 +52,8 @@ endif
 ifneq ($(filter $(CPP_PROJECT), $(TRUE)),)
 CC=avr-g++
 CFLAGS += -Wno-write-strings
+SOURCES += $(wildcard $(UTILS_DIR)/cpp/*.cpp)
+INCLUDES += $(UTILS_DIR)/cpp/
 else
 CC=avr-gcc
 endif
@@ -87,15 +89,16 @@ Device          DEVICE          uController chip                $(DEVICE)
                 PROGRAMMER      type of uController programmer  $(PROGRAMMER)
 
 Project         CPP_PROJECT     is C++ project?                 $(CPP_PROJECT)  
-                WITH_OS         uses ChibiOS?                   $(WITH_OS)      
+                WITH_OS         uses ChibiOS?                   $(WITH_OS)
+                UTILS_SUPPORT   utils such as i2c, debug, etc.  $(UTILS_SUPPORT)
+                FLOAT_SUPPORT   support float printf/scanf      $(FLOAT_SUPPORT)      
+                DEBUG           add -DDEBUG=1 to cflags         $(DEBUG)
         
 Compiler        PROJECT_NAME    name of project                 $(PROJECT_NAME)
-                *SOURCES        all .c and .cpp files           $(SOURCES)
-                *INCLUDES       list of directories to include  $(INCLUDES)
                 CC              avr gcc path                    $(CC)
-                UTILS_SUPPORT   utils such as i2c, debug, etc.  $(UTILS_SUPPORT)
-                FLOAT_SUPPORT   support float printf/scanf      $(FLOAT_SUPPORT)
                 CFLAGS          add to cflag of avr gcc         $(CFLAGS)
+                *INCLUDES       list of directories to include  $(INCLUDES)
+                *SOURCES        all .c and .cpp files           $(SOURCES)
 
 SW Unittest     UNITTEST_SUPPORT                                $(UNITTEST_SUPPORT) 
                 TEST_SOURCES    files to be tested              $(TEST_SOURCES)
