@@ -44,9 +44,12 @@ ifneq ($(filter $(IDE_SUPPORT), $(TRUE)),) # check if arduino ide library is sup
 CPP_PROJECT = yes
 WITH_OS = no
 INCLUDES += $(AVR_DIR)hardware/arduino/cores/arduino/ $(AVR_DIR)hardware/arduino/variants/standard/
-SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/*.cpp)
-SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/*.c)
-SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/avr-libc/*.c)
+#INCLUDES += $(dir $(shell find $(AVR_DIR)/libraries/Wire -type f -name '*.h'))
+CORELIB_SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/*.cpp)
+CORELIB_SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/*.c)
+CORELIB_SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/avr-libc/*.c)
+SOURCES += $(shell find $(AVR_DIR)/libraries/ -name '*.c')
+SOURCES += $(shell find $(AVR_DIR)/libraries/ -name '*.cpp')
 endif
 
 ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),) # check if UTILS_SUPPORT is 1|yes|YES
@@ -63,7 +66,6 @@ CFLAGS  += -Wl,-u,vfprintf -lprintf_flt -Wl,-u,vfscanf -lscanf_flt -lm # printf 
 endif
 
 ifneq ($(filter $(CPP_PROJECT), $(TRUE)),)
-CPPFLAGS := $(CFLAGS)
 CPPFLAGS += -Wno-write-strings -fno-exceptions
 endif
 

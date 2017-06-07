@@ -11,6 +11,9 @@
 #include <compat/twi.h>
 
 #include "SerialDebug.h"
+#include "Timer.h"
+
+static volatile long _sec;
 
 /*
  i2c_io - write and read bytes to a slave I2C device
@@ -238,6 +241,11 @@ uint8_t i2c_io(uint8_t device_addr, const uint8_t *ap, uint16_t an,
 	return (status);
 }
 
+static void incSec()
+{
+	++_sec;
+}
+
 /*
  i2c_init - Initialize the I2C port
  */
@@ -245,6 +253,11 @@ void i2c_init(uint8_t bdiv)
 {
 	TWSR = 0;                           // Set prescalar for 1
 	TWBR = bdiv;                        // Set bit rate register
+
+	// init timer 2
+	_sec = 0;
+	Timer1Init(1000);
+	Timer1SetCallback(incSec);
 }
 
 static volatile uint8_t _i2cIsRunning;

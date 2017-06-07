@@ -15,6 +15,8 @@
 #include "AVRString.h"
 
 #define SERIALDEBUG_DEFAULT_BAUD	57600 // default baud rate when calling SerialDebugInit()
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__) // show file name only
+
 
 #ifndef LOG
 #ifdef DEBUG
@@ -23,13 +25,13 @@
 #define LOG(msg, arg...) \
 	{  char __msg[STRING_MAXLEN];\
 	snprintf(__msg, STRING_MAXLEN, msg, ##arg);\
-	SerialDebugPrint("%s:%d - (%d)\t%s", __FILE__, __LINE__, freeMemory(), __msg); \
+	SerialDebugPrint("%s:%d - (%d)\t%s", __FILENAME__, __LINE__, freeMemory(), __msg); \
 	}
 #else
 #define LOG(msg, arg...) \
 	{ char __msg[STRING_MAXLEN]; \
 	sprintf(__msg, msg, ##arg);\
-	printf("%s:%d - %s \n", __FILE__, __LINE__, __msg); \
+	printf("%s:%d - %s \n", __FILE__, __LINENAME__, __msg); \
 	}
 #endif
 #else

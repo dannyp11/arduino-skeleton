@@ -29,14 +29,16 @@ void Timer1Init(uint16_t ms);
 void Timer2init(uint16_t n);
 
 /**
- * register callback 1 for timer 1
+ * register callback for timer 1
+ *
+ * supports up to 2 callbacks
  *
  * @param callback
  */
 void Timer1SetCallback(Timer1Callback callback);
 
 /**
- * register callback for timer 1
+ * register callback for timer 2
  *
  * @param callback
  */

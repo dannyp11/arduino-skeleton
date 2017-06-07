@@ -57,7 +57,7 @@ TARGET = ch
 OBJDIR = .
 
 # Imported source files
-CHIBIOS ?= ../../os/ChibiOS
+CHIBIOS ?= ../../submodules/ChibiOS
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/hal/boards/ARDUINO_UNO/board.mk
 include $(CHIBIOS)/os/hal/ports/AVR/platform.mk

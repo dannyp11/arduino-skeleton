@@ -1,3 +1,3 @@
-[submodule "os/ChibiOS"]
-	path = os/ChibiOS
-	url = https://github.com/ChibiOS/ChibiOS
+[submodule "submodules/Arduino-Makefile"]
+	path = submodules/Arduino-Makefile
+	url = https://github.com/sudar/Arduino-Makefile

@@ -12,27 +12,23 @@
 #include <stdio.h>
 #include <util/delay.h>
 
+
 const char PROGMEM helpaddr1[] = "Hint address: LCD 0x28, compass 0x19";
-const char PROGMEM help1[] =
-		"Sample command \t\t - explanation (command case insensitive)";
+const char PROGMEM help1[] = "Sample command \t\t - explanation (command case insensitive)";
 const char PROGMEM help2[] = "ADDR 28 \t\t - set i2c 7-bit address as 0x28";
 const char PROGMEM help3[] = "TX 2 00 03 \t\t - send 2 bytes 0x00 and 0x03";
-const char PROGMEM help0[] =
-		"TX \"hello world\" \t - send string \"hello world\"";
-const char PROGMEM help4[] =
-		"RX 6 2 ab 03 \t\t - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx";
+const char PROGMEM help0[] = "TX \"hello world\" \t - send string \"hello world\"";
+const char PROGMEM help4[] = "RX 6 2 ab 03 \t\t - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx";
 const char PROGMEM help41[] = "SLOW 0 \t\t\t - set slow sending off";
-const char PROGMEM helploop1[] =
-		"LOOP 2 TX 2 00 03 \t - loop the command 'TX 2 00 03' for 2 seconds";
-const char PROGMEM helploop2[] =
-		"LOOP 5 RX 6 1 ab \t - loop the command 'RX 6 1 ab' for 5 seconds";
+const char PROGMEM helploop1[] = "LOOP 2 TX 2 00 03 \t - loop the command 'TX 2 00 03' for 2 seconds";
+const char PROGMEM helploop2[] = "LOOP 5 RX 6 1 ab \t - loop the command 'RX 6 1 ab' for 5 seconds";
 const char PROGMEM help5[] = "---------------";
 const char PROGMEM help6[] = "testlcd \t\t - test the lcd 4x20";
 const char PROGMEM help7[] = "testgy85compass \t - test the GY-85 compass";
 const char PROGMEM help71[] = "testgy85accel \t\t - test the GY-85 accelerator";
 const char PROGMEM help72[] = "HISTORY \t\t - show past entered messages";
-const char PROGMEM help8[] =
-		"========================================================================";
+const char PROGMEM help73[] = "SCAN \t\t\t - scan all I2C devices on the bus (asking 0x00 register)";
+const char PROGMEM help8[] = "========================================================================";
 
 static volatile unsigned long mMillis;
 
@@ -69,6 +65,8 @@ void showHelp()
 	PgmStorageGet(msg, helploop2);
 	SerialDebugPrint(msg);
 
+	// history help
+#ifndef DEBUG
 	PgmStorageGet(msg, help5);
 	SerialDebugPrint(msg);
 
@@ -81,9 +79,10 @@ void showHelp()
 	PgmStorageGet(msg, help71);
 	SerialDebugPrint(msg);
 
-	// history help
-#ifndef DEBUG
 	PgmStorageGet(msg, help72);
+	SerialDebugPrint(msg);
+
+	PgmStorageGet(msg, help73);
 	SerialDebugPrint(msg);
 #endif
 
@@ -183,6 +182,56 @@ void showHistory()
 		SerialDebugPrint(I2CConsoleStackMoveDown());
 	}
 #endif
+}
+
+void runScan()
+{
+	const char scanCmd[] = "rx 1 1 0";
+	char cmdMsg[STRING_MAXLEN];
+	uint8_t device_addr, parserResult, sendResult;
+
+	SerialDebugPrint("Scanning for devices ...");
+	for (device_addr = 0; device_addr < 128; ++device_addr)
+	{
+		I2CConsoleMessage msg;
+		snprintf(cmdMsg, STRING_MAXLEN, "addr %x", device_addr);
+		SerialDebugPrintNoEndl("address %s: ", cmdMsg);
+		parserResult = I2CConsoleParser(cmdMsg, &msg);
+		if (!parserResult)
+		{
+			sendResult = I2CConsoleSendCommand(&msg);
+			if (sendResult)
+			{
+				SerialDebugPrint("error set address %d", sendResult);
+				continue;
+			}
+		}
+		else
+		{
+			SerialDebugPrint("error parse set address %d", parserResult);
+			continue;
+		}
+		_delay_ms(1);
+
+		strcpy(cmdMsg, scanCmd);
+		parserResult = I2CConsoleParser(cmdMsg, &msg);
+		if (!parserResult)
+		{
+			sendResult = I2CConsoleSendCommand(&msg);
+			if (!sendResult)
+			{
+				SerialDebugPrint("Found device!!");
+			}
+			else
+			{
+				SerialDebugPrint("error code %d sending '%s'", sendResult, scanCmd);
+			}
+		}
+		else
+		{
+			SerialDebugPrint("error parsing '%s'", scanCmd);
+		}
+	}
 }
 
 static void incMillis()
@@ -336,6 +385,11 @@ int main()
 		{
 			// show command history
 			showHistory();
+		}
+		else if (strcasecmp(buffer, "SCAN") == 0)
+		{
+			// scan all i2c devices on the bus
+			runScan();
 		}
 		else if (strcasecmp(buffer, "testlcd") == 0)
 		{
