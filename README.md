@@ -42,7 +42,7 @@ Currently works with Unix system, compatible with Arduino framework (setup/loop)
         Please email author tdpham1105@yahoo.com
         Or file issue via github
 
-	# Release Note
+# Release Note
 * DONE v1.0.0 - all-C projects
   + I2C console via serial port: make I2C debugging easier
   + GPS NMEA data parser with LCD: track walked distance & position compared to initial one
@@ -52,4 +52,5 @@ Currently works with Unix system, compatible with Arduino framework (setup/loop)
   + Support Arduino IDE framework (Arduino Makefile)
   + Build skeleton C library
   + skeleton.mk is one-stop .mk for all projects, include it at the end of project's makefile
+  + create libutils.a
     

@@ -17,13 +17,13 @@ OBJ_DIR  = tmp/
 OBJ_TMP  = $(addprefix $(OBJ_DIR)/, $(notdir ${OBJECTS}))
 
 IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
+CFLAGS  += -Wall -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=106 #arduino specific
+CFLAGS  += -fshort-enums -O2 -Os # more optimizing
 CPPFLAGS += $(CFLAGS)
 
 ifeq ($(filter $(FLOAT_SUPPORT), $(TRUE)),) # only turn on this if float support disabled
 ifneq ($(filter $(OPTIMIZE), $(TRUE)),)
 CFLAGS  += -fdata-sections -ffunction-sections -Wl,--gc-sections # garbage collection
-CFLAGS  += -Wall -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=106 #arduino specific
-CFLAGS  += -fshort-enums -O2 -Os # more optimizing
 endif
 endif
 
