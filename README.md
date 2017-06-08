@@ -49,8 +49,7 @@ Currently works with Unix system, compatible with Arduino framework (setup/loop)
   + Simple calculator via serial port, supports +-*/() and non negative numbers
 * TODO v2.0.0 - matured C support & new mk files structure
   + Software Serial C support upto baud 9600 for RX, 115200 for TX
-  + Support Arduino IDE framework (Arduino Makefile)
-  + Build skeleton C library
-  + skeleton.mk is one-stop .mk for all projects, include it at the end of project's makefile
-  + create libutils.a
+  + Support Arduino IDE framework (Arduino Makefile) - done
+  + skeleton.mk is one-stop .mk for all projects, include it at the end of project's makefile - done
+  + create libutils.a - done
     

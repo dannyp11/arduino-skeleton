@@ -32,22 +32,21 @@ BINARY_NAME=$(PROJECT_NAME).elf
 HEX_NAME=$(PROJECT_NAME).hex
 SOURCES ?= $(wildcard *.c) $(wildcard *.cpp)
 INCLUDES ?= ./
-OPTIMIZE ?= yes
 
+OPTIMIZE ?= YES
 UNITTEST_SUPPORT ?= no
 UTILS_SUPPORT ?= no
 FLOAT_SUPPORT ?= no
 DEBUG ?= no
 IDE_SUPPORT ?= no
 
-ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),) # check if UTILS_SUPPORT is 1|yes|YES
-SOURCES	  += $(wildcard $(UTILS_DIR)/*.c)
-INCLUDES  += $(UTILS_DIR) 
-CFLAGS += -fno-move-loop-invariants # fix compiler error push_reload, at reload.c:1360, https://gcc.gnu.org/bugzilla/show_bug.cgi?id=71932
-endif
-
 ifneq ($(filter $(DEBUG), $(TRUE)),) # check if -DDEBUG should be added
 CFLAGS  += -DDEBUG=1
+endif
+
+ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),) # check if UTILS_SUPPORT is 1|yes|YES
+INCLUDES  += $(UTILS_DIR) 
+CFLAGS += -fno-move-loop-invariants # fix compiler error push_reload, at reload.c:1360, https://gcc.gnu.org/bugzilla/show_bug.cgi?id=71932
 endif
 
 ifneq ($(filter $(FLOAT_SUPPORT), $(TRUE)),) # check if FLOAT_SUPPORT is 1|yes|YES
@@ -56,6 +55,9 @@ OPTIMIZE = no
 endif
 ###########
 ifneq ($(filter $(IDE_SUPPORT), $(TRUE)),) # check if arduino ide library is supported, force using c++ if true
+ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),) # check if UTILS_SUPPORT is 1|yes|YES
+SOURCES	  += $(wildcard $(UTILS_DIR)/*.c)
+endif
 include $(MKFILES_DIR)/ide.mk
 else
 ###########
@@ -64,6 +66,9 @@ CPPFLAGS += -Wno-write-strings -fno-exceptions
 endif
 
 ifneq ($(filter $(WITH_OS), $(TRUE)),) # include with-os.mk
+ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),) # check if UTILS_SUPPORT is 1|yes|YES
+SOURCES	  += $(wildcard $(UTILS_DIR)/*.c)
+endif
 include $(MKFILES_DIR)/with-chibios.mk
 else
 include $(MKFILES_DIR)/without-os.mk

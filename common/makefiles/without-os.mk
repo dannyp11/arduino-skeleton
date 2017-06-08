@@ -27,6 +27,20 @@ CFLAGS  += -fdata-sections -ffunction-sections -Wl,--gc-sections # garbage colle
 endif
 endif
 
+# libutils support
+ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),)
+LIBUTILS = $(OBJ_DIR)libutils.a
+UTILS_SOURCES ?= $(wildcard $(UTILS_DIR)/*.c) $(wildcard $(UTILS_DIR)/*.cpp)
+endif
+UTILS_DIR  ?= $(TOP)/common/utils/
+UTILS_INCLUDEFLAGS ?= -I$(UTILS_DIR)
+
+UTILS_OBJECTS	 = $(patsubst %.cpp, %.cpp.libo, $(UTILS_SOURCES))
+UTILS_OBJECTS	 += $(patsubst %.c, %.c.libo, $(UTILS_SOURCES))
+UTILS_OBJECTS  := $(filter-out %.c, $(UTILS_OBJECTS))
+UTILS_OBJECTS  := $(filter-out %.cpp, $(UTILS_OBJECTS))
+UTILS_OBJ_TMP  = $(addprefix $(OBJ_DIR)/, $(notdir ${UTILS_OBJECTS}))
+
 # Fuse Low Byte = 0xe0   Fuse High Byte = 0xd9   Fuse Extended Byte = 0xff
 # Bit 7: CKDIV8  = 0     Bit 7: RSTDISBL  = 1    Bit 7:
 #     6: CKOUT   = 1         6: DWEN      = 1        6:
@@ -48,19 +62,31 @@ endif
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
 COMPILE = $(CC) $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(IFLAGS)
 COMPILE_CPP = $(CPP) $(CPPFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(IFLAGS)
+LINK_LIBUTILS = avr-ar rcs $(LIBUTILS)
+UTILS_COMPILE = $(CC) $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(UTILS_INCLUDEFLAGS)
+UTILS_COMPILE_CPP = $(CPP) $(CPPFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(UTILS_INCLUDEFLAGS)
 
 # symbolic targets:
 .default: all
 
-all: clean
-	@mkdir -p $(OBJ_DIR)
+all: 
 	$(MAKE) $(HEX_NAME)	
 	
 .c.o:
+	@mkdir -p $(OBJ_DIR)
 	$(COMPILE) -c $< -o $(OBJ_DIR)/$(notdir $@)
 
 .cpp.o:
+	@mkdir -p $(OBJ_DIR)
 	$(COMPILE_CPP) -c $< -o $(OBJ_DIR)/$(notdir $@)
+
+%.c.libo: %.c
+	@mkdir -p $(OBJ_DIR)
+	$(UTILS_COMPILE) -c $< -o $(OBJ_DIR)/$(notdir $@)
+
+%.cpp.libo: %.cpp
+	@mkdir -p $(OBJ_DIR)
+	$(UTILS_COMPILE_CPP) -c $< -o $(OBJ_DIR)/$(notdir $@)
 
 flash:	all
 	$(AVRDUDE) -U flash:w:$(HEX_NAME):i
@@ -76,12 +102,21 @@ load: all
 	bootloadHID $(HEX_NAME)
 
 clean: 
-	rm -f $(HEX_NAME) $(BINARY_NAME)
+	rm -f $(HEX_NAME) $(BINARY_NAME) $(LIBUTILS)
 	rm -rf $(OBJ_DIR)
 
 # file targets:
-$(BINARY_NAME): $(OBJECTS)
-	$(COMPILE) -o $(BINARY_NAME) $(OBJ_TMP)
+ifeq ($(wildcard $(LIBUTILS)),) # check if libutils.a exists
+$(LIBUTILS): $(UTILS_OBJECTS)
+	echo $(wildcard $(LIBUTILS))
+	$(foreach obj, $(UTILS_OBJ_TMP), $(LINK_LIBUTILS) $(obj) ; )
+else
+$(LIBUTILS):
+	
+endif
+
+$(BINARY_NAME): $(OBJECTS) $(LIBUTILS)
+	$(COMPILE) -o $(BINARY_NAME) $(OBJ_TMP) $(LIBUTILS)
 
 $(HEX_NAME): $(BINARY_NAME)
 	rm -f $(HEX_NAME)
