@@ -1,3 +1,6 @@
 [submodule "submodules/Arduino-Makefile"]
 	path = submodules/Arduino-Makefile
 	url = https://github.com/sudar/Arduino-Makefile
+[submodule "submodules/ChibiOS"]
+	path = submodules/ChibiOS
+	url = https://github.com/ChibiOS/ChibiOS

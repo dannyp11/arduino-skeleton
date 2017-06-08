@@ -21,3 +21,8 @@
 * TESTLCD                       - test 4x20 lcd
 * TESTGY85COMPASS               - test gy85 compass
 * TESTGY85ACCEL                 - test gy85 accelerator
+* SCAN                          - ping all addresses and show which is alive
+
+# Note
+  - OPTIMIZE is turned off for now
+

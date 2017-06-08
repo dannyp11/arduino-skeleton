@@ -3,7 +3,8 @@ CFLAGS = -Wextra
 DEBUG = no
 FLOAT_SUPPORT = no # support printf, sscanf floats
 UTILS_SUPPORT = YES # extra utils such as soft serial, i2c, serial debug
-PROJECT_NAME = i2c-console.hex
+PROJECT_NAME = i2c-console
+OPTIMIZE = no
 TOP = ../../../
 
 # required

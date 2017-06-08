@@ -9,16 +9,15 @@ TOP :=$(shell dirname $(MKFILE_PATH))/../
 
 # Arduino specific ##################################################################
 DEVICE     = atmega328p
-CLOCK      = 16000000
+CLOCK      = 16000000L
 TTY	  ?= /dev/ttyACM0
-#PROGRAMMER = -c usbtiny -P usb
 PROGRAMMER = -c arduino -P $(TTY) -b 115200
 
 # Directory path ####################################################################
-OS_DIR     = $(TOP)/os/ChibiOS/
+OS_DIR     = $(TOP)/submodules/ChibiOS/
+ARDUINO_MAKEFILE_DIR = $(TOP)/submodules/Arduino-Makefile
 UTILS_DIR  = $(TOP)/common/utils/
 MKFILES_DIR = $(TOP)/common/makefiles/
-AVR_DIR     ?= /usr/share/arduino/
 
 # Project types #####################################################################
 CPP_PROJECT ?= no
@@ -33,6 +32,7 @@ BINARY_NAME=$(PROJECT_NAME).elf
 HEX_NAME=$(PROJECT_NAME).hex
 SOURCES ?= $(wildcard *.c) $(wildcard *.cpp)
 INCLUDES ?= ./
+OPTIMIZE ?= yes
 
 UNITTEST_SUPPORT ?= no
 UTILS_SUPPORT ?= no
@@ -40,21 +40,10 @@ FLOAT_SUPPORT ?= no
 DEBUG ?= no
 IDE_SUPPORT ?= no
 
-ifneq ($(filter $(IDE_SUPPORT), $(TRUE)),) # check if arduino ide library is supported, force using c++ if true
-CPP_PROJECT = yes
-WITH_OS = no
-INCLUDES += $(AVR_DIR)hardware/arduino/cores/arduino/ $(AVR_DIR)hardware/arduino/variants/standard/
-#INCLUDES += $(dir $(shell find $(AVR_DIR)/libraries/Wire -type f -name '*.h'))
-CORELIB_SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/*.cpp)
-CORELIB_SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/*.c)
-CORELIB_SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/avr-libc/*.c)
-SOURCES += $(shell find $(AVR_DIR)/libraries/ -name '*.c')
-SOURCES += $(shell find $(AVR_DIR)/libraries/ -name '*.cpp')
-endif
-
 ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),) # check if UTILS_SUPPORT is 1|yes|YES
 SOURCES	  += $(wildcard $(UTILS_DIR)/*.c)
 INCLUDES  += $(UTILS_DIR) 
+CFLAGS += -fno-move-loop-invariants # fix compiler error push_reload, at reload.c:1360, https://gcc.gnu.org/bugzilla/show_bug.cgi?id=71932
 endif
 
 ifneq ($(filter $(DEBUG), $(TRUE)),) # check if -DDEBUG should be added
@@ -64,7 +53,11 @@ endif
 ifneq ($(filter $(FLOAT_SUPPORT), $(TRUE)),) # check if FLOAT_SUPPORT is 1|yes|YES
 CFLAGS  += -Wl,-u,vfprintf -lprintf_flt -Wl,-u,vfscanf -lscanf_flt -lm # printf scanf float support
 endif
-
+###########
+ifneq ($(filter $(IDE_SUPPORT), $(TRUE)),) # check if arduino ide library is supported, force using c++ if true
+include $(MKFILES_DIR)/ide.mk
+else
+###########
 ifneq ($(filter $(CPP_PROJECT), $(TRUE)),)
 CPPFLAGS += -Wno-write-strings -fno-exceptions
 endif
@@ -74,6 +67,9 @@ include $(MKFILES_DIR)/with-chibios.mk
 else
 include $(MKFILES_DIR)/without-os.mk
 endif
+
+endif
+##########
 
 # Unittest config #####################################################################
 TEST_SOURCES ?=
@@ -95,8 +91,8 @@ define helpMenu
 Configurable Variable names (* means required)
 Section         Name            Description                     Current value
 Device          DEVICE          uController chip                $(DEVICE)
-                CLOCK           uController speed in MHz        $(CLOCK)
-                TTY             path to tty device              $(TTY)   
+(non-ide)       CLOCK           uController speed in MHz        $(CLOCK)
+                TTY             path to tty device (no ide)     $(TTY)   
                 PROGRAMMER      type of uController programmer  $(PROGRAMMER)
 
 Project         CPP_PROJECT     is C++ project?                 $(CPP_PROJECT)  
@@ -104,11 +100,11 @@ Project         CPP_PROJECT     is C++ project?                 $(CPP_PROJECT)
                 UTILS_SUPPORT   utils such as i2c, debug, etc.  $(UTILS_SUPPORT)
                 FLOAT_SUPPORT   support float printf/scanf      $(FLOAT_SUPPORT)
                 IDE_SUPPORT     support ide lib (setup, loop)?  $(IDE_SUPPORT)
-                DEBUG           add -DDEBUG=1 to cflags         $(DEBUG)
-                AVR_DIR         path to installed library       $(AVR_DIR)
-        
-Compiler        PROJECT_NAME    name of project                 $(PROJECT_NAME)
-                CFLAGS          add to cflag of avr gcc         $(CFLAGS)
+                DEBUG           add -DDEBUG=1 to cflags         $(DEBUG)       
+                OPTIMIZE	enable optimization?		$(OPTIMIZE) 
+                PROJECT_NAME    name of project                 $(PROJECT_NAME)
+
+Compiler        CFLAGS          add to cflag of avr gcc         $(CFLAGS)
                 CPPFLAGS	add to c++ flags of avr g++	$(CPPFLAGS)
                 *INCLUDES       list of directories to include  $(INCLUDES)
                 *SOURCES        all .c and .cpp files           $(SOURCES)
@@ -125,5 +121,6 @@ SW Unittest     UNITTEST_SUPPORT                                $(UNITTEST_SUPPO
 endef
 export helpMenu
 help:
+	@$(TOP)/project_manager.sh -t 'Skeleton help menu:'
 	@echo  "$$helpMenu"
         

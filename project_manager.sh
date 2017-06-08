@@ -14,10 +14,10 @@ print_title()
 	local GREEN='\033[0;32m'
 	local NC='\033[0m' # No Color
 
-	local txt=$1
-	echo -e "${GREEN} =========================================="
-	echo " $txt"
-	echo -e " ========================================== ${NC}"
+	local txt=$@
+	echo -e "\n${GREEN}|=============================================="
+	echo "| $txt"
+	echo -e "|==============================================${NC}"
 }
 
 # run all make check in directory recursively
@@ -26,6 +26,7 @@ function checkFolder()
 	find "$1" -name Makefile | while read line; do		
                 local TEST_DIR=$(dirname $line)/test/
                 if [ -d "$TEST_DIR" ] ; then
+                	print_title "Checking in $(dirname ${line})" ;	
                         make -C $(dirname $line) check BRIEF=1 -j4
                 fi		
 	done		
@@ -43,7 +44,7 @@ function cleanFolder()
 function makeFolder()
 {
 	find "$1" -name Makefile | while read line; do	
-	        print_title "Compiling" ;	
+	        print_title "Compiling in $(dirname ${line})" ;	
 		make -C $(dirname $line) all -j4
 	done		
 }
@@ -63,7 +64,7 @@ EOF
 
 # main ##############################################################
 # getopt
-while getopts ":c:k:m:" o; do
+while getopts ":c:k:m:t:" o; do
     case "${o}" in
         c)
             cleanFolder ${OPTARG}            
@@ -73,6 +74,9 @@ while getopts ":c:k:m:" o; do
             ;;
         m)
             makeFolder ${OPTARG}
+            ;;
+        t)
+            print_title ${OPTARG}
             ;;
         *)
             showHelp

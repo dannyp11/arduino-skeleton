@@ -15,7 +15,6 @@ compile:
 	$(TOP)/project_manager.sh -m test/
 	$(TOP)/project_manager.sh -m c-project/
 	$(TOP)/project_manager.sh -m cpp-project/
-	$(TOP)/project_manager.sh -m common/
 	
 # clean all projects for maintaining purpose
 clean:

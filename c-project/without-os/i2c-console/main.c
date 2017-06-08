@@ -8,6 +8,7 @@
 #include "SerialDebug.h"
 #include "PgmStorage.h"
 #include "Timer.h"
+#include "I2C.h"
 
 #include <stdio.h>
 #include <util/delay.h>
@@ -27,7 +28,7 @@ const char PROGMEM help6[] = "testlcd \t\t - test the lcd 4x20";
 const char PROGMEM help7[] = "testgy85compass \t - test the GY-85 compass";
 const char PROGMEM help71[] = "testgy85accel \t\t - test the GY-85 accelerator";
 const char PROGMEM help72[] = "HISTORY \t\t - show past entered messages";
-const char PROGMEM help73[] = "SCAN \t\t\t - scan all I2C devices on the bus (asking 0x00 register)";
+const char PROGMEM help73[] = "SCAN \t\t\t - scan all I2C devices on the bus";
 const char PROGMEM help8[] = "========================================================================";
 
 static volatile unsigned long mMillis;
@@ -186,50 +187,14 @@ void showHistory()
 
 void runScan()
 {
-	const char scanCmd[] = "rx 1 1 0";
-	char cmdMsg[STRING_MAXLEN];
-	uint8_t device_addr, parserResult, sendResult;
+	uint8_t device_addr;
 
 	SerialDebugPrint("Scanning for devices ...");
 	for (device_addr = 0; device_addr < 128; ++device_addr)
 	{
-		I2CConsoleMessage msg;
-		snprintf(cmdMsg, STRING_MAXLEN, "addr %x", device_addr);
-		SerialDebugPrintNoEndl("address %s: ", cmdMsg);
-		parserResult = I2CConsoleParser(cmdMsg, &msg);
-		if (!parserResult)
+		if (!I2CCheckAlive(device_addr))
 		{
-			sendResult = I2CConsoleSendCommand(&msg);
-			if (sendResult)
-			{
-				SerialDebugPrint("error set address %d", sendResult);
-				continue;
-			}
-		}
-		else
-		{
-			SerialDebugPrint("error parse set address %d", parserResult);
-			continue;
-		}
-		_delay_ms(1);
-
-		strcpy(cmdMsg, scanCmd);
-		parserResult = I2CConsoleParser(cmdMsg, &msg);
-		if (!parserResult)
-		{
-			sendResult = I2CConsoleSendCommand(&msg);
-			if (!sendResult)
-			{
-				SerialDebugPrint("Found device!!");
-			}
-			else
-			{
-				SerialDebugPrint("error code %d sending '%s'", sendResult, scanCmd);
-			}
-		}
-		else
-		{
-			SerialDebugPrint("error parsing '%s'", scanCmd);
+			SerialDebugPrint("Found device 0x%x", device_addr);
 		}
 	}
 }

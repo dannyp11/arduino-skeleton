@@ -256,8 +256,8 @@ void i2c_init(uint8_t bdiv)
 
 	// init timer 2
 	_sec = 0;
-	Timer1Init(1000);
-	Timer1SetCallback(incSec);
+//	Timer1Init(1000);
+//	Timer1SetCallback(incSec);
 }
 
 static volatile uint8_t _i2cIsRunning;
@@ -300,4 +300,60 @@ uint8_t I2CSendnRecvData(uint8_t address, const uint8_t * txdata,
 	_i2cIsRunning = 0;
 
 	return result;
+}
+
+/**
+ * Check if address responds on I2C
+ *
+ * @param address - 7bit address
+ * @return 0 on alive
+ * 			1 on NAK recv
+ * 			2 on START not ok
+ * 			3 on address not sent ok
+ * 			4 on unknown
+ */
+uint8_t I2CCheckAlive(uint8_t address)
+{
+	uint8_t status;
+	uint8_t retVal = 0;
+
+	// send I2C start
+	TRACE()
+	TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTA); // Send start condition
+	while (!(TWCR & (1 << TWINT))) ;     // Wait for TWINT to be set
+	TRACE()
+	status = TWSR & 0xf8;
+	if (status != 0x08)                 // Check that START was sent OK
+	{
+		retVal = 2;
+	}
+
+	TRACE()
+	// send the address
+	if (!retVal)
+	{
+		TWDR = (address << 1) & 0xfe;          // Load device address and R/W = 0;
+		TWCR = (1 << TWINT) | (1 << TWEN);  // Start transmission
+		while (!(TWCR & (1 << TWINT)));     // Wait for TWINT to be set
+
+		TRACE()
+		status = TWSR & 0xf8;
+		if (status != 0x18)
+		{               // Check that SLA+W was sent OK
+			if (status == 0x20)             // Check for NAK
+			{
+				retVal = 1;
+			}
+			else
+			{
+				retVal = 4;
+			}
+		}
+	}
+
+	// send stop
+	TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO); // Send STOP condition
+	_delay_ms(1);
+
+	return retVal;
 }

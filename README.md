@@ -1,15 +1,17 @@
 # arduino-skeleton
 This is the first embarkment of my learning experience & side projects. Let's see how far I could go :)
-
 Skeleton framework for Arduino with/without RTOS, uses avr gcc/ g++
+Currently works with Unix system, compatible with Arduino framework (setup/loop) using sudar's repo
 
-Currently works with Unix system, compatible with Arduino framework (setup/loop)
-Note: this repo now supports Arduino IDE, only need to set IDE_SUPPORT to true from skeleton.mk
+* Note: 
+  1. This repo now supports Arduino IDE, only need to set IDE_SUPPORT to true from skeleton.mk
+  2. Even though it supports C++ project, I will try to develop drivers/low level in C
 
 # Directory Structure
         +---test/                               - all component testers go here, test code uses no os
-        +---os/                                 - optional RTOS (currently ChibiOS)
-        |       +---ChibiOS/                    - 
+        +---submodules/                         - remote dependency
+        |       +---ChibiOS/                    -
+        |       +---Arduino-Makefile/           - 
         +---c-project/                          - skeleton for C based projects
         |       +---with-os/                    -
         |       +---without-os/                 -
@@ -40,15 +42,14 @@ Note: this repo now supports Arduino IDE, only need to set IDE_SUPPORT to true f
         Please email author tdpham1105@yahoo.com
         Or file issue via github
 
-# Release Note
+	# Release Note
 * DONE v1.0.0 - all-C projects
   + I2C console via serial port: make I2C debugging easier
   + GPS NMEA data parser with LCD: track walked distance & position compared to initial one
   + Simple calculator via serial port, supports +-*/() and non negative numbers
-
 * TODO v2.0.0 - matured C support & new mk files structure
   + Software Serial C support upto baud 9600 for RX, 115200 for TX
-  + Support Arduino IDE framework
-  + Build core & skeleton library
+  + Support Arduino IDE framework (Arduino Makefile)
+  + Build skeleton C library
   + skeleton.mk is one-stop .mk for all projects, include it at the end of project's makefile
-
+    

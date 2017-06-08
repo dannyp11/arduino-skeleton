@@ -3,20 +3,6 @@ MKFILE_DIRNAME := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
 TOP :=$(shell dirname $(MKFILE_PATH))/../../
 FUSES      = -U hfuse:w:0xd9:m -U lfuse:w:0xe0:m
 
-# arduino core lib
-AVR_DIR     ?= /usr/share/arduino/
-IDE_SUPPORT ?= no
-CORELIB     ?= 
-ifneq ($(filter $(IDE_SUPPORT), $(TRUE)),) # check if arduino ide library is supported, force using c++ if true
-CORELIB      = libcorearduino.a
-INCLUDES ?= $(AVR_DIR)hardware/arduino/cores/arduino/ $(AVR_DIR)hardware/arduino/variants/standard/
-ifeq ($(CORELIB_SOURCES),)
-CORELIB_SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/*.cpp) 
-CORELIB_SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/*.c) 
-CORELIB_SOURCES += $(wildcard $(AVR_DIR)/hardware/arduino/cores/arduino/avr-libc/*.c)
-endif		
-endif
-
 # default variable values
 SOURCES ?= $(wildcard *.c) $(wildcard *.cpp)
 INCLUDES ?= ./
@@ -27,22 +13,18 @@ OBJECTS	 += $(patsubst %.c, %.o, $(SOURCES))
 OBJECTS  := $(filter-out %.c, $(OBJECTS))
 OBJECTS  := $(filter-out %.cpp, $(OBJECTS))
 
-CORELIB_OBJECTS	 = $(patsubst %.cpp, %.libo, $(CORELIB_SOURCES))
-CORELIB_OBJECTS	 += $(patsubst %.c, %.libo, $(CORELIB_SOURCES))
-CORELIB_OBJECTS  := $(filter-out %.c, $(CORELIB_OBJECTS))
-CORELIB_OBJECTS  := $(filter-out %.cpp, $(CORELIB_OBJECTS))
-
 OBJ_DIR  = tmp/
 OBJ_TMP  = $(addprefix $(OBJ_DIR)/, $(notdir ${OBJECTS}))
-LIBOBJ_TMP  = $(addprefix $(OBJ_DIR)/, $(notdir ${CORELIB_OBJECTS}))
 
 IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
-CFLAGS  += -Wall -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=106040 #arduino specific
-CFLAGS  += -fshort-enums -O2 # more optimizing
 CPPFLAGS += $(CFLAGS)
 
 ifeq ($(filter $(FLOAT_SUPPORT), $(TRUE)),) # only turn on this if float support disabled
+ifneq ($(filter $(OPTIMIZE), $(TRUE)),)
 CFLAGS  += -fdata-sections -ffunction-sections -Wl,--gc-sections # garbage collection
+CFLAGS  += -Wall -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=106 #arduino specific
+CFLAGS  += -fshort-enums -O2 -Os # more optimizing
+endif
 endif
 
 # Fuse Low Byte = 0xe0   Fuse High Byte = 0xd9   Fuse Extended Byte = 0xff
@@ -66,7 +48,6 @@ endif
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
 COMPILE = $(CC) $(CFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(IFLAGS)
 COMPILE_CPP = $(CPP) $(CPPFLAGS) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) $(IFLAGS)
-LINK_LIB = $(AR) rcs $(CORELIB)
 
 # symbolic targets:
 .default: all
@@ -79,12 +60,6 @@ all: clean
 	$(COMPILE) -c $< -o $(OBJ_DIR)/$(notdir $@)
 
 .cpp.o:
-	$(COMPILE_CPP) -c $< -o $(OBJ_DIR)/$(notdir $@)
-	
-%.libo: %.c
-	$(COMPILE) -c $< -o $(OBJ_DIR)/$(notdir $@)
-
-%.libo: %.cpp
 	$(COMPILE_CPP) -c $< -o $(OBJ_DIR)/$(notdir $@)
 
 flash:	all
@@ -105,8 +80,8 @@ clean:
 	rm -rf $(OBJ_DIR)
 
 # file targets:
-$(BINARY_NAME): $(OBJECTS) $(CORELIB)
-	$(COMPILE) -o $(BINARY_NAME) $(OBJ_TMP) $(CORELIB)
+$(BINARY_NAME): $(OBJECTS)
+	$(COMPILE) -o $(BINARY_NAME) $(OBJ_TMP)
 
 $(HEX_NAME): $(BINARY_NAME)
 	rm -f $(HEX_NAME)
@@ -114,16 +89,6 @@ $(HEX_NAME): $(BINARY_NAME)
 	avr-size -C $(BINARY_NAME) --mcu=$(DEVICE)
 # If you have an EEPROM section, you must also create a hex file for the
 # EEPROM and add it to the "flash" target.
-
-ifeq ($(shell ls $(CORELIB)),)
-$(CORELIB): 
-	@mkdir -p $(OBJ_DIR)
-	$(MAKE) $(CORELIB_OBJECTS)
-	$(foreach obj,$(CORELIB_OBJECTS), $(AR) rcs $(CORELIB) $(OBJ_DIR)/$(notdir $(obj)) ;) 
-else
-$(CORELIB):
-	
-endif
 
 # Targets for code debugging and analysis:
 disasm:	$(BINARY_NAME)

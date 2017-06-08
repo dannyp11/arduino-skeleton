@@ -29,7 +29,8 @@
  
 #include <Wire.h>
 #include <Arduino.h> 
- 
+#include <HardwareSerial.h>
+
 void setup()
 {
   Wire.begin();
