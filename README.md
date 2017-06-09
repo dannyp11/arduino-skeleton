@@ -41,15 +41,3 @@ Currently works with Unix system, compatible with Arduino framework (setup/loop)
 # Question & Bug fix?
         Please email author tdpham1105@yahoo.com
         Or file issue via github
-
-# Release Note
-* DONE v1.0.0 - all-C projects
-  + I2C console via serial port: make I2C debugging easier
-  + GPS NMEA data parser with LCD: track walked distance & position compared to initial one
-  + Simple calculator via serial port, supports +-*/() and non negative numbers
-* TODO v2.0.0 - matured C support & new mk files structure
-  + Software Serial C support upto baud 9600 for RX, 115200 for TX
-  + Support Arduino IDE framework (Arduino Makefile) - done
-  + skeleton.mk is one-stop .mk for all projects, include it at the end of project's makefile - done
-  + create libutils.a - done
-    

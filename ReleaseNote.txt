@@ -1,0 +1,17 @@
+# Release Note
+* DONE v1.0.0 - all-C projects
+** I2C console via serial port: make I2C debugging easier
+** GPS NMEA data parser with LCD: track walked distance & position compared to initial one
+** Simple calculator via serial port, supports +-*/() and non negative numbers
+  
+* TODO v2.0.0 - matured C support & new mk files structure
+** INPROGRESS Software Serial C support upto baud 9600 for RX, 115200 for TX
+** DONE Support Arduino IDE framework (Arduino Makefile)
+** DONE skeleton.mk is one-stop .mk for all projects, include it at the end of project's makefile
+** DONE create libutils.a
+
+* WAIT v2.1.0 - Google test support & C sensor library support
+** add common/makefiles/gtest.mk
+** motion sensor test code
+** hand clap sound detector
+** full range adc & pin change interrupt C support
