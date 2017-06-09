@@ -8,12 +8,14 @@ int main(void)
 	I2CInit();
 
 	uint8_t address;
+	uint8_t nothingFound = 1;
 
 	for (address = 0x00; address < 128; ++address)
 	{
 		uint8_t checkResult = I2CCheckAlive(address);
 		if (!checkResult)
 		{
+			nothingFound = 0;
 			SerialDebugPrint("0x%x is alive", address);
 		}
 #ifdef DEBUG
@@ -24,6 +26,11 @@ int main(void)
 		}
 #endif
 
+	}
+
+	if (nothingFound)
+	{
+		SerialDebugPrint("No device found");
 	}
 
 	while (1)

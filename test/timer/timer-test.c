@@ -75,7 +75,7 @@ int main(void)
 	Timer1Init(1);
 	Timer1SetCallback(incMillis);
 
-	Timer2init(MICROS_INC);
+	Timer2Init(MICROS_INC);
 	Timer2SetCallback(incMicros);
 
 	int prev_sec = -1;

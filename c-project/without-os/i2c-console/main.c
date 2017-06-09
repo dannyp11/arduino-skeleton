@@ -9,6 +9,7 @@
 #include "PgmStorage.h"
 #include "Timer.h"
 #include "I2C.h"
+#include "Millis.h"
 
 #include <stdio.h>
 #include <util/delay.h>
@@ -30,8 +31,6 @@ const char PROGMEM help71[] = "testgy85accel \t\t - test the GY-85 accelerator";
 const char PROGMEM help72[] = "HISTORY \t\t - show past entered messages";
 const char PROGMEM help73[] = "SCAN \t\t\t - scan all I2C devices on the bus";
 const char PROGMEM help8[] = "========================================================================";
-
-static volatile unsigned long mMillis;
 
 void processMessage(const char * buffer);
 
@@ -199,11 +198,6 @@ void runScan()
 	}
 }
 
-static void incMillis()
-{
-	++mMillis;
-}
-
 void parseNRunMessage(const char * message)
 {
 	I2CConsoleMessage cmd;
@@ -273,8 +267,8 @@ void loopCommand(const char * message)
 				SerialDebugPrint("looping %d seconds for '%s'", loop_time,
 						message + strlen("loop ") + strlen(token) + 1);
 
-				uint8_t initSec = mMillis / 1000;
-				while ((uint8_t) (mMillis / 1000) - initSec
+				uint8_t initSec = Millis() / 1000;
+				while ((uint8_t) (Millis() / 1000) - initSec
 						<= (uint8_t) loop_time)
 				{
 					parseNRunMessage(
@@ -325,10 +319,6 @@ int main()
 #ifndef DEBUG
 	I2CConsoleStackInit();
 #endif
-
-	Timer1Init(1);
-	mMillis = 0;
-	Timer1SetCallback(incMillis);
 
 	while (1)
 	{

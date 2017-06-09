@@ -11,9 +11,7 @@
 #include <compat/twi.h>
 
 #include "SerialDebug.h"
-#include "Timer.h"
-
-static volatile long _sec;
+#include "Millis.h"
 
 /*
  i2c_io - write and read bytes to a slave I2C device
@@ -241,11 +239,6 @@ uint8_t i2c_io(uint8_t device_addr, const uint8_t *ap, uint16_t an,
 	return (status);
 }
 
-static void incSec()
-{
-	++_sec;
-}
-
 /*
  i2c_init - Initialize the I2C port
  */
@@ -254,10 +247,7 @@ void i2c_init(uint8_t bdiv)
 	TWSR = 0;                           // Set prescalar for 1
 	TWBR = bdiv;                        // Set bit rate register
 
-	// init timer 2
-	_sec = 0;
-//	Timer1Init(1000);
-//	Timer1SetCallback(incSec);
+	MillisInit();
 }
 
 static volatile uint8_t _i2cIsRunning;
@@ -314,13 +304,35 @@ uint8_t I2CSendnRecvData(uint8_t address, const uint8_t * txdata,
  */
 uint8_t I2CCheckAlive(uint8_t address)
 {
+	if (_i2cIsRunning)
+		return 1;
+	_i2cIsRunning = 1;
+
 	uint8_t status;
 	uint8_t retVal = 0;
+	unsigned long long initMillis = 0;
+	uint8_t isValid = 0;
 
 	// send I2C start
 	TRACE()
 	TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTA); // Send start condition
-	while (!(TWCR & (1 << TWINT))) ;     // Wait for TWINT to be set
+
+	initMillis = Millis();
+	isValid = 0;
+	while ( Millis() - initMillis < 100)
+	{
+		if ((TWCR & (1 << TWINT))) // Wait for TWINT to be set in 100ms
+		{
+			isValid = 1;
+			break;
+		}
+	}
+	if (!isValid)
+	{
+		retVal = 4;
+		goto _I2CCheckAlive_sendstop;
+	}
+
 	TRACE()
 	status = TWSR & 0xf8;
 	if (status != 0x08)                 // Check that START was sent OK
@@ -334,7 +346,22 @@ uint8_t I2CCheckAlive(uint8_t address)
 	{
 		TWDR = (address << 1) & 0xfe;          // Load device address and R/W = 0;
 		TWCR = (1 << TWINT) | (1 << TWEN);  // Start transmission
-		while (!(TWCR & (1 << TWINT)));     // Wait for TWINT to be set
+
+		initMillis = Millis();
+		isValid = 0;
+		while ( Millis() - initMillis < 100)
+		{
+			if ((TWCR & (1 << TWINT))) // Wait for TWINT to be set in 100ms
+			{
+				isValid = 1;
+				break;
+			}
+		}
+		if(!isValid)
+		{
+			retVal = 4;
+			goto _I2CCheckAlive_sendstop;
+		}
 
 		TRACE()
 		status = TWSR & 0xf8;
@@ -346,14 +373,16 @@ uint8_t I2CCheckAlive(uint8_t address)
 			}
 			else
 			{
-				retVal = 4;
+				retVal = 5;
 			}
 		}
 	}
 
+_I2CCheckAlive_sendstop:
 	// send stop
 	TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO); // Send STOP condition
 	_delay_ms(1);
 
+	_i2cIsRunning = 0;
 	return retVal;
 }

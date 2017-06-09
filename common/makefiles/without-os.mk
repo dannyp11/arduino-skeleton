@@ -75,18 +75,22 @@ all:
 .c.o:
 	@mkdir -p $(OBJ_DIR)
 	$(COMPILE) -c $< -o $(OBJ_DIR)/$(notdir $@)
+	@echo ""
 
 .cpp.o:
 	@mkdir -p $(OBJ_DIR)
 	$(COMPILE_CPP) -c $< -o $(OBJ_DIR)/$(notdir $@)
+	@echo ""
 
 %.c.libo: %.c
 	@mkdir -p $(OBJ_DIR)
 	$(UTILS_COMPILE) -c $< -o $(OBJ_DIR)/$(notdir $@)
+	@echo ""
 
 %.cpp.libo: %.cpp
 	@mkdir -p $(OBJ_DIR)
 	$(UTILS_COMPILE_CPP) -c $< -o $(OBJ_DIR)/$(notdir $@)
+	@echo ""
 
 flash:	all
 	$(AVRDUDE) -U flash:w:$(HEX_NAME):i
@@ -104,12 +108,12 @@ load: all
 clean: 
 	rm -f $(HEX_NAME) $(BINARY_NAME) $(LIBUTILS)
 	rm -rf $(OBJ_DIR)
+	rm -f $(UTILS_DIR)/*.d
 
 # file targets:
 ifeq ($(wildcard $(LIBUTILS)),) # check if libutils.a exists
 $(LIBUTILS): $(UTILS_OBJECTS)
-	echo $(wildcard $(LIBUTILS))
-	$(foreach obj, $(UTILS_OBJ_TMP), $(LINK_LIBUTILS) $(obj) ; )
+	$(foreach obj, $(UTILS_OBJ_TMP), $(LINK_LIBUTILS) $(obj) ;)
 else
 $(LIBUTILS):
 	

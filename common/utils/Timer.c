@@ -8,7 +8,7 @@
 #include "Timer.h"
 #include <avr/interrupt.h>
 
-static Timer1Callback mT1Callback, mT1Callback2;
+static Timer1Callback mT1Callback1, mT1Callback2;
 static Timer2Callback mT2Callback;
 
 void Timer1Init(uint16_t ms)
@@ -18,7 +18,7 @@ void Timer1Init(uint16_t ms)
 		return;
 	isInited = 1;
 
-	mT1Callback = 0;
+	mT1Callback1 = 0;
 	mT1Callback2 = 0;
 
 	cli();
@@ -33,9 +33,9 @@ void Timer1Init(uint16_t ms)
 
 void Timer1SetCallback(Timer1Callback callback)
 {
-	if (!mT1Callback)
+	if (!mT1Callback1)
 	{
-		mT1Callback = callback;
+		mT1Callback1 = callback;
 	}
 	else
 	{
@@ -50,9 +50,9 @@ void Timer2SetCallback(Timer2Callback callback)
 
 ISR(TIMER1_COMPA_vect)
 {
-	if (mT1Callback)
+	if (mT1Callback1)
 	{
-		mT1Callback();
+		mT1Callback1();
 	}
 
 	if (mT1Callback2)
@@ -69,7 +69,7 @@ ISR(TIMER2_COMPA_vect)
 	}
 }
 
-void Timer2init(uint16_t n)
+void Timer2Init(uint16_t n)
 {
 	static uint8_t isInited = 0;
 	if (isInited)

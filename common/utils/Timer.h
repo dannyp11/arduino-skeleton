@@ -26,7 +26,7 @@ void Timer1Init(uint16_t ms);
  *
  * @param us
  */
-void Timer2init(uint16_t n);
+void Timer2Init(uint16_t n);
 
 /**
  * register callback for timer 1

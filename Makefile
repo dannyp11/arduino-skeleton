@@ -13,8 +13,8 @@ check:
 # comipile all projects
 compile:        
 	$(TOP)/project_manager.sh -m test/
-	$(TOP)/project_manager.sh -m c-project/
-	$(TOP)/project_manager.sh -m cpp-project/
+	$(TOP)/project_manager.sh -f -m c-project/ 
+	$(TOP)/project_manager.sh -f -m cpp-project/ 
 	
 # clean all projects for maintaining purpose
 clean:

@@ -34,6 +34,8 @@ uint8_t I2CSendnRecvData(uint8_t address, const uint8_t * txdata, uint8_t txdata
  * 			1 on NAK recv
  * 			2 on START not ok
  * 			3 on address not sent ok
+ * 			4 on timeout
+ * 			5 on unknown error
  */
 uint8_t I2CCheckAlive(uint8_t address);
 

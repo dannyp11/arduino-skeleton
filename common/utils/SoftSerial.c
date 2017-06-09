@@ -193,7 +193,7 @@ void SoftSerialInit()
 	TOGGLE_PIN(SS_DDR_PORT_RX, SS_RX_PIN, 0); // input on rx
 
 	// config interrupt
-	Timer2init(1000000ul / SS_BAUD - 2);
+	Timer2Init(1000000ul / SS_BAUD - 2);
 	Timer2SetCallback(fetchChar);
 
 	// config getcdata
