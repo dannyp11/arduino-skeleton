@@ -1,5 +1,5 @@
 # to program to arduino, type make flash
-CFLAGS = 
+CFLAGS = -Wl,-u,vfprintf -lprintf_flt -lm
 UTILS_SUPPORT = yes
 DEBUG =1
 

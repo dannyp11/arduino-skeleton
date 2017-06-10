@@ -247,7 +247,7 @@ void i2c_init(uint8_t bdiv)
 	TWSR = 0;                           // Set prescalar for 1
 	TWBR = bdiv;                        // Set bit rate register
 
-	MillisInit();
+	MillisInit(2);
 }
 
 static volatile uint8_t _i2cIsRunning;
@@ -300,8 +300,14 @@ uint8_t I2CSendnRecvData(uint8_t address, const uint8_t * txdata,
  * 			1 on NAK recv
  * 			2 on START not ok
  * 			3 on address not sent ok
- * 			4 on unknown
+ * 			4 on timeout, check your wiring
+ * 			5 on unknown error
  */
+#ifdef DEBUG
+#define _I2C_TIMEOUT_INTERVAL	1000
+#else
+#define _I2C_TIMEOUT_INTERVAL	100
+#endif
 uint8_t I2CCheckAlive(uint8_t address)
 {
 	if (_i2cIsRunning)
@@ -310,7 +316,7 @@ uint8_t I2CCheckAlive(uint8_t address)
 
 	uint8_t status;
 	uint8_t retVal = 0;
-	unsigned long long initMillis = 0;
+	unsigned long initMillis = 0;
 	uint8_t isValid = 0;
 
 	// send I2C start
@@ -319,7 +325,7 @@ uint8_t I2CCheckAlive(uint8_t address)
 
 	initMillis = Millis();
 	isValid = 0;
-	while ( Millis() - initMillis < 100)
+	while ( Millis() - initMillis < _I2C_TIMEOUT_INTERVAL)
 	{
 		if ((TWCR & (1 << TWINT))) // Wait for TWINT to be set in 100ms
 		{
@@ -327,6 +333,7 @@ uint8_t I2CCheckAlive(uint8_t address)
 			break;
 		}
 	}
+	TRACE()
 	if (!isValid)
 	{
 		retVal = 4;
@@ -349,7 +356,7 @@ uint8_t I2CCheckAlive(uint8_t address)
 
 		initMillis = Millis();
 		isValid = 0;
-		while ( Millis() - initMillis < 100)
+		while ( Millis() - initMillis < _I2C_TIMEOUT_INTERVAL)
 		{
 			if ((TWCR & (1 << TWINT))) // Wait for TWINT to be set in 100ms
 			{

@@ -32,6 +32,10 @@ int main(void)
 	{
 		SerialDebugPrint("No device found");
 	}
+	else
+	{
+		SerialDebugPrint("Done scanning");
+	}
 
 	while (1)
 	{

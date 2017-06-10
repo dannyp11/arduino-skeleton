@@ -1,8 +1,7 @@
 # This makefile doesn't build anything, just for maintaining the skeleton 
-
 TOP = ./
-.PHONY: clean
 
+.PHONY: compile
 # run all unit tests in all folders
 check:
 	$(TOP)/project_manager.sh -k test/
@@ -26,6 +25,10 @@ clean:
 readme info:
 	@view README.md
 
+# show release note
+log:
+	@view ReleaseNote.txt
+
 # show help
 help:
-	$(TOP)/project_manager.sh -h
+	$(TOP)/project_manager.sh -h	

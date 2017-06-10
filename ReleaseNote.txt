@@ -4,14 +4,21 @@
 ** GPS NMEA data parser with LCD: track walked distance & position compared to initial one
 ** Simple calculator via serial port, supports +-*/() and non negative numbers
   
-* TODO v2.0.0 - matured C support & new mk files structure
-** INPROGRESS Software Serial C support upto baud 9600 for RX, 115200 for TX
+* DONE v2.0.0 - matured C support & new mk files structure
+  - State "DONE"       from "INPROGRESS" [2017-06-10 Sat 01:00]
+** DONE Software Serial C support upto 115200 for TX (RX isn't stable so it's dropped)
+   - State "DONE"       from "INPROGRESS" [2017-06-10 Sat 00:59]
 ** DONE Support Arduino IDE framework (Arduino Makefile)
 ** DONE skeleton.mk is one-stop .mk for all projects, include it at the end of project's makefile
 ** DONE create libutils.a
+** INPROGRESS v2.0.1 - migrate SerialDebugPrint api to non-macro, restructure i2c-console parser
+*** TODO change SerialDebugPrint* api & test src
+*** WAIT move i2c-console parser to module & callback management
+*** WAIT GPS breakout board to output to softserial
 
 * WAIT v2.1.0 - Google test support & C sensor library support
 ** add common/makefiles/gtest.mk
+*** add simple gtest project
 ** motion sensor test code
 ** hand clap sound detector
 ** full range adc & pin change interrupt C support
