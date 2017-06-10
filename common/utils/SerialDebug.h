@@ -23,16 +23,13 @@
 #ifndef CXXTEST
 
 #define LOG(msg, arg...) \
-	{  char __msg[STRING_MAXLEN];\
-	snprintf(__msg, STRING_MAXLEN, msg, ##arg);\
-	SerialDebugPrint("%s:%d - (%d)\t%s", __FILENAME__, __LINE__, freeMemory(), __msg); \
-	}
+		{SerialDebugPrintNoEndl("%s:%d - (%d)\t", __FILENAME__, __LINE__, freeMemory()); \
+		SerialDebugPrint(msg, ##arg);}
+
 #else
 #define LOG(msg, arg...) \
-	{ char __msg[STRING_MAXLEN]; \
-	sprintf(__msg, msg, ##arg);\
-	printf("%s:%d - %s \n", __FILE__, __LINENAME__, __msg); \
-	}
+		printf("%s:%d - \t", __FILENAME__, __LINE__); \
+		printf(msg, ##arg); printf("\n");
 #endif
 #else
 #define LOG(...) ;
@@ -54,24 +51,11 @@ void SerialDebugInit(void);
  */
 void SerialDebugInitWithBaudRate(unsigned baudrate);
 
-#ifndef SerialDebugPrint
 /*
  * Printf to serial port
  */
-#define SerialDebugPrint(arg...) \
-{ 	char _msg[STRING_MAXLEN];\
-	snprintf(_msg, STRING_MAXLEN, ##arg); \
-	_SerialDebugPrint1(_msg); \
-}
-#define SerialDebugPrintNoEndl(arg...) \
-{ 	char _msg[STRING_MAXLEN];\
-	snprintf(_msg, STRING_MAXLEN, ##arg); \
-	_SerialDebugPrintNoEndl(_msg); \
-}
-#endif
-void _SerialDebugPrint1(const char* message);
-void _SerialDebugPrintNoEndl(const char* message);
-
+void SerialDebugPrint(const char* format, ...);
+void SerialDebugPrintNoEndl(const char* format, ...);
 
 /*
  * Fetches byte from receive buffer

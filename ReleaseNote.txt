@@ -12,8 +12,10 @@
 ** DONE skeleton.mk is one-stop .mk for all projects, include it at the end of project's makefile
 ** DONE create libutils.a
 ** INPROGRESS v2.0.1 - migrate SerialDebugPrint api to non-macro, restructure i2c-console parser
-*** TODO change SerialDebugPrint* api & test src
-*** WAIT move i2c-console parser to module & callback management
+*** DONE change SerialDebugPrint* api & test src
+    SCHEDULED: <2017-06-10 Sat>
+    - State "DONE"       from "INPROGRESS" [2017-06-10 Sat 17:10]
+*** INPROGRESS move i2c-console parser to module & callback management
 *** WAIT GPS breakout board to output to softserial
 
 * WAIT v2.1.0 - Google test support & C sensor library support
