@@ -34,7 +34,7 @@ void AVRStringRefineString(char * buffer);
  that pointer with the returned value, since the original pointer must be
  deallocated using the same allocator with which it was allocated.  The return
  value must NOT be deallocated using free() etc.
- *TLDR: str will be modified in pointer so be careful about dealloc it
+ *TLDR: str will be modified in pointer so be careful about dealloc the return value
  *
  * @param str
  * @return

@@ -71,7 +71,7 @@ public:
 		TS_ASSERT_EQUALS(message.isValid, 1);
 		TS_ASSERT_EQUALS(message.tx_len, 10);
 		I2CConsoleDumpCommand(&message);
-
+//
 		resetMessage(&message);
 		TS_ASSERT_EQUALS(I2CConsoleParser(input5.c_str(), &message), 0);
 		TS_ASSERT_EQUALS(message.command, SET_SLOW);

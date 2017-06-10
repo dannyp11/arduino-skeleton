@@ -1,7 +1,7 @@
 /*
- * I2CConsole.c
+ * I2CConsoleParser.c - handling parsing command
  *
- *  Created on: May 29, 2017
+ *  Created on: Jun 10, 2017
  *      Author: dat
  */
 
@@ -11,8 +11,24 @@
 
 #include "SerialDebug.h"
 
-static uint8_t _i2c_address;
-static uint8_t _i2c_slowTx;
+/**
+ * Callback signature for each command
+ *
+ * @param message - contains parameters for the command, should not contain command name, i.e. "28" "\"hello\""
+ * @param result - message result to be updated
+ * @param errcode - has to be 0 to be continue parsing
+ * @return	- updated errcode
+ */
+typedef uint8_t (*I2CConsolerParserCallback) (const char * message, I2CConsoleMessage * result, uint8_t errcode);
+
+typedef struct _commandSignature
+{
+	char cmdName[10];
+	I2CConsolerParserCallback callback;
+} CommandSignature;
+
+#define _I2C_MAX_PARSER_CALLBACKS	10
+static CommandSignature g_ParserCallbackDB[_I2C_MAX_PARSER_CALLBACKS]; // main DB for all parser callbacks
 
 /**
  * internal - process and parse array of hex numbers to result
@@ -136,7 +152,7 @@ uint8_t processAddr(const char * message, I2CConsoleMessage * result,
 
 	// set address
 	result->command = SET_ADDRESS;
-	if (sscanf(message + 5, "%x", &result->address) != 1)
+	if (sscanf(message, "%x", &result->address) != 1)
 	{
 		TRACE()
 		errcode = 1;
@@ -153,7 +169,7 @@ uint8_t processSlow(const char * message, I2CConsoleMessage * result,
 
 	// set address
 	result->command = SET_SLOW;
-	if (sscanf(message + 5, "%u", &result->isDelayBetweenBytes) != 1)
+	if (sscanf(message, "%u", &result->isDelayBetweenBytes) != 1)
 	{
 		TRACE()
 		errcode = 1;
@@ -171,7 +187,7 @@ uint8_t processTX(const char * message, I2CConsoleMessage * result,
 	// send
 	result->command = SEND;
 
-	errcode = processTXPart((char*) message + strlen("TX "), result, errcode);
+	errcode = processTXPart(message, result, errcode);
 
 	return errcode;
 }
@@ -193,25 +209,22 @@ uint8_t processRX(const char * message, I2CConsoleMessage * result,
 	while (token != NULL)
 	{
 		// break into token strings
-		if (n != 0) // ignore 1st token
+		// rx len
+		if (n == 0)
 		{
-			// rx len
-			if (n == 1)
+			if (sscanf(token, "%u", &result->rx_len) != 1)
 			{
-				if (sscanf(token, "%u", &result->rx_len) != 1)
-				{
-					TRACE()
-					errcode = 1;
-				}
-				else
-				{
-					// parse tx part
-					errcode = processTXPart(
-							(char*) message + strlen("RX ") + strlen(token) + 1,
-							result, errcode);
+				TRACE()
+				errcode = 1;
+			}
+			else
+			{
+				// parse tx part
+				errcode = processTXPart(
+						(char*) message + strlen(token) + 1,
+						result, errcode);
 
-					break;
-				}
+				break;
 			}
 		}
 
@@ -223,6 +236,61 @@ uint8_t processRX(const char * message, I2CConsoleMessage * result,
 
 	return errcode;
 }
+
+/**
+ * internal - final touch of result
+ *
+ * @param result - message to process
+ * @return	- 0 on success
+ */
+uint8_t finalizeMessage(I2CConsoleMessage * result)
+{
+	uint8_t retVal = 0;
+	(void) result;
+	return retVal;
+}
+
+/**
+ * Internal - doesn't check for error if DB is full, be careful
+ *
+ * @param signature - max 10 chars signature
+ * @param callback
+ */
+void registerParserCallback(const char * signature, I2CConsolerParserCallback callback)
+{
+	uint8_t i;
+	for (i = 0; i < _I2C_MAX_PARSER_CALLBACKS; ++i)
+	{
+		if (g_ParserCallbackDB[i].callback == 0)
+		{
+			// only empty db entry is eligible
+			strcpy(g_ParserCallbackDB[i].cmdName, signature);
+			g_ParserCallbackDB[i].callback = callback;
+			return;
+		}
+	}
+}
+
+/**
+ * Init and register all parser callbacks
+ */
+void parserInit()
+{
+	// set all cb entries in db to 0 (invalid cb)
+	uint8_t i;
+	for (i = 0; i < _I2C_MAX_PARSER_CALLBACKS; ++i)
+	{
+		g_ParserCallbackDB[i].callback = 0;
+		g_ParserCallbackDB[i].cmdName[0] = '\0';
+	}
+
+	// put your favorite parser here
+	registerParserCallback("addr", processAddr);
+	registerParserCallback("slow", processSlow);
+	registerParserCallback("tx", processTX);
+	registerParserCallback("rx", processRX);
+}
+
 /**
  * log - done command: tx rx addr slow
  *
@@ -234,6 +302,14 @@ uint8_t processRX(const char * message, I2CConsoleMessage * result,
  */
 uint8_t I2CConsoleParser(const char * message, I2CConsoleMessage * result)
 {
+	static char isInited = 0;
+	if (!isInited)
+	{
+		// register module callbacks
+		parserInit();
+		isInited = 1;
+	}
+
 	uint8_t retVal = 0;
 	result->isValid = 0;
 	result->rx_len = 0;
@@ -249,28 +325,30 @@ uint8_t I2CConsoleParser(const char * message, I2CConsoleMessage * result)
 		retVal = 1;
 	}
 
-	if (strcasecmp(command, "ADDR") == 0)
+	// scan db and run respective parser callback
+	uint8_t i;
+	uint8_t isValidCommand = 0;
+	for (i = 0; i< _I2C_MAX_PARSER_CALLBACKS; ++i)
 	{
-		// set address
-		retVal = processAddr(message, result, retVal);
+		if (g_ParserCallbackDB[i].callback && strcasecmp(command, g_ParserCallbackDB[i].cmdName) == 0)
+		{
+			retVal = g_ParserCallbackDB[i].callback(message + strlen(command) + 1, result, retVal);
+			isValidCommand = 1;
+			break;
+		}
 	}
-	else if (strcasecmp(command, "SLOW") == 0)
+
+	// if no parser cb is found
+	if (!isValidCommand)
 	{
-		// set wait between bytes send
-		retVal = processSlow(message, result, retVal);
-	}
-	else if (strcasecmp(command, "TX") == 0)
-	{
-		retVal = processTX(message, result, retVal);
-	}
-	else if (strcasecmp(command, "RX") == 0)
-	{
-		retVal = processRX(message, result, retVal);
-	}
-	else
-	{
-		TRACE()
+		TRACE();
 		retVal = 2;
+	}
+
+	// reserved for future
+	if (!retVal)
+	{
+		retVal = finalizeMessage(result);
 	}
 
 	if (!retVal)
@@ -317,123 +395,3 @@ void I2CConsoleDumpCommand(const I2CConsoleMessage * command)
 	(void) command;
 #endif
 }
-
-#ifndef CXXTEST
-#include "I2C.h"
-#include <util/delay.h>
-
-static void consoleInit()
-{
-	static uint8_t isInited = 0;
-	if (!isInited)
-	{
-		I2CInit();
-		_i2c_address = 0x00;
-		_i2c_slowTx = 1;
-		isInited = 1;
-	}
-}
-
-uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command)
-{
-	consoleInit();
-
-	uint8_t retVal = (command->isValid) ? 0 : 2;
-
-	if (!retVal)
-	{
-		uint8_t data[I2CMESSAGE_MAXLEN]; // for converting to uint8_t array
-
-		if (command->command == SET_ADDRESS)
-		{
-			_i2c_address = (uint8_t) command->address;
-		}
-		else
-		{
-			command->address = _i2c_address;
-			int i;
-
-			if (command->tx_len)
-			{
-				for (i = 0; i < command->tx_len; ++i)
-				{
-					data[i] = command->tx[i];
-				}
-			}
-			else if (command->message)
-			{
-				for (i = 0; i < (int) strlen(command->message); ++i)
-				{
-					data[i] = command->message[i];
-				}
-			}
-		}
-
-		if (command->command == SET_SLOW)
-		{
-			_i2c_slowTx = (command->isDelayBetweenBytes) ? 1 : 0;
-		}
-		else
-		{
-			command->isDelayBetweenBytes = _i2c_slowTx;
-		}
-
-		if (_i2c_address != 0x00)
-		{
-			if (command->command == SEND)
-			{
-				if (command->tx_len)
-				{
-					retVal += I2CSendData(_i2c_address, data, command->tx_len,
-							_i2c_slowTx);
-				}
-
-				else if (command->message)
-				{
-					retVal += I2CSendData(_i2c_address, data,
-							strlen(command->message), _i2c_slowTx);
-				}
-			}
-			else if (command->command == SENDNRECV)
-			{
-
-				if (command->tx_len)
-				{
-					retVal += I2CSendnRecvData(_i2c_address, data,
-							command->tx_len, command->rx, command->rx_len,
-							_i2c_slowTx);
-				}
-
-				else if (command->message)
-				{
-					retVal += I2CSendnRecvData(_i2c_address, data,
-							strlen(command->message), command->rx,
-							command->rx_len, _i2c_slowTx);
-				}
-			}
-		}
-		else
-		{
-			retVal = 3;
-		}
-	}
-
-	if (!retVal)
-		_delay_ms(150);
-
-	return retVal;
-}
-
-uint8_t I2CConsoleGetCurrentAddress()
-{
-	consoleInit();
-	return _i2c_address;
-}
-
-uint8_t I2CConsoleGetSlowSendingStatus()
-{
-	consoleInit();
-	return _i2c_slowTx;
-}
-
-#endif
