@@ -13,15 +13,17 @@
 #define MILLIS_MAX_CALLBACKS	3
 
 /**
- * Init millisecond, this will use timer2, don't use timer2 if use this Millis
+ * Init millisecond, this will use timer
+ * If other apis called before this API, it will default to timer 2
  *
+ * @param timerNumber - timer 1 or 2
  */
-void MillisInit();
+char MillisInit(char timerNumber);
 
 /**
- * main getter of millis
+ * main getter of millis, will always return 1 if error on init
  */
-unsigned long long Millis();
+unsigned long Millis();
 
 /**
  * Register callback function for every millisecond

@@ -58,6 +58,7 @@ ifneq ($(filter $(IDE_SUPPORT), $(TRUE)),) # check if arduino ide library is sup
 ifneq ($(filter $(UTILS_SUPPORT), $(TRUE)),) # check if UTILS_SUPPORT is 1|yes|YES
 SOURCES	  += $(wildcard $(UTILS_DIR)/*.c)
 endif
+CPP_PROJECT = YES
 include $(MKFILES_DIR)/ide.mk
 else
 ###########
@@ -104,6 +105,7 @@ Device          DEVICE          uController chip                $(DEVICE)
 Project         CPP_PROJECT     is C++ project?                 $(CPP_PROJECT)  
                 WITH_OS         uses ChibiOS?                   $(WITH_OS)
                 UTILS_SUPPORT   utils such as i2c, debug, etc.  $(UTILS_SUPPORT)
+                UTILS_DIR	path to utils source code	$(UTILS_DIR)
                 FLOAT_SUPPORT   support float printf/scanf      $(FLOAT_SUPPORT)
                 IDE_SUPPORT     support ide lib (setup, loop)?  $(IDE_SUPPORT)
                 DEBUG           add -DDEBUG=1 to cflags         $(DEBUG)       
