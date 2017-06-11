@@ -9,13 +9,16 @@
 #define SERIALDEBUG_H_
 
 #include <stdio.h>
+#include <string.h>
 
 #include "MemoryFree.h"
 #include "AVRString.h"
 
 #define SERIALDEBUG_DEFAULT_BAUD	57600 // default baud rate when calling SerialDebugInit()
-#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__) // show file name only
 
+#ifndef __FILENAME__
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__) // show file name only
+#endif
 
 #ifndef LOG
 #ifdef DEBUG

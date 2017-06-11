@@ -9,6 +9,7 @@
 #define UTILS_SOFTSERIAL_H_
 
 #include <stdarg.h>
+#include <string.h>
 #include "MemoryFree.h"
 
 // TX pin config
