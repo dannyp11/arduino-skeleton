@@ -237,6 +237,22 @@ uint8_t processRX(const char * message, I2CConsoleMessage * result,
 	return errcode;
 }
 
+uint8_t processPing(const char * message, I2CConsoleMessage * result,
+		uint8_t errcode)
+{
+	if (errcode) return errcode;
+
+	// set address
+	result->command = PING;
+	if (sscanf(message, "%x", &result->address) != 1)
+	{
+		TRACE()
+		errcode = 1;
+	}
+
+	return errcode;
+}
+
 /**
  * internal - final touch of result
  *
@@ -289,10 +305,11 @@ void parserInit()
 	registerParserCallback("slow", processSlow);
 	registerParserCallback("tx", processTX);
 	registerParserCallback("rx", processRX);
+	registerParserCallback("ping", processPing);
 }
 
 /**
- * log - done command: tx rx addr slow
+ * log - done command: tx rx addr slow ping
  *
  * wip -
  *

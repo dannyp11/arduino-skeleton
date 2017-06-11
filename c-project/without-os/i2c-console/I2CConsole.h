@@ -17,7 +17,8 @@ typedef enum _i2ccommand
 	SEND = 0,
 	SENDNRECV,
 	SET_ADDRESS,
-	SET_SLOW
+	SET_SLOW,
+	PING
 } I2CConsoleCommand;
 
 typedef struct _i2cMessage
@@ -44,6 +45,7 @@ typedef struct _i2cMessage
  * LOOP 3 TX "hello world" - loop in 3 seconds for sending TX "hello world"
  * LOOP 5 RX 6 2 ab 03 	- loop in 5 seconds for sending RX 6 2 ab 03
  * SLOW 0			 - set slow sending off
+ * PING 23			- check if address 0x23 is alive
  *
  * @param inputmessage
  * @param result
@@ -62,6 +64,7 @@ uint8_t I2CConsoleParser(const char * message, I2CConsoleMessage * result);
  * 			- 1 on failed sending/recv
  * 			- 2 on invalid message
  * 			- 3 on invalid address
+ * 			- 4 on timeout of ping
  */
 uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command);
 

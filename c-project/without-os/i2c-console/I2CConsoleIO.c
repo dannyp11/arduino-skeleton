@@ -41,6 +41,11 @@ uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command)
 		{
 			_i2c_address = (uint8_t) command->address;
 		}
+		else if (command->command == PING)
+		{
+			// don't change command address if it's PING
+			;
+		}
 		else
 		{
 			command->address = _i2c_address;
@@ -71,7 +76,7 @@ uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command)
 			command->isDelayBetweenBytes = _i2c_slowTx;
 		}
 
-		if (_i2c_address != 0x00)
+		if (command->address != 0x00)
 		{
 			if (command->command == SEND)
 			{
@@ -103,6 +108,12 @@ uint8_t I2CConsoleSendCommand(I2CConsoleMessage * command)
 							strlen(command->message), command->rx,
 							command->rx_len, _i2c_slowTx);
 				}
+			}
+			else if (command->command == PING)
+			{
+				retVal = (I2CCheckAlive(command->address) == 0) ? retVal : 4;
+				TRACE_INT(retVal);
+				LOG("address %x", command->address);
 			}
 		}
 		else

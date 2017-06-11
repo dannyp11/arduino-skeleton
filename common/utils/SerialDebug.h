@@ -9,7 +9,6 @@
 #define SERIALDEBUG_H_
 
 #include <stdio.h>
-#include <string.h>
 
 #include "MemoryFree.h"
 #include "AVRString.h"

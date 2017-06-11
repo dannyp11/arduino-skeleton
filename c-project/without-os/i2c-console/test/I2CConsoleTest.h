@@ -33,6 +33,7 @@ public:
 		const string input3 = "RX 6 2 ab 03";
 		const string input4 = "TX 10 1 2 3 4 5 6 7 8 9 10";
 		const string input5 = "slow 0";
+		const string input6 = "ping 23";
 
 		I2CConsoleMessage message;
 		resetMessage(&message);
@@ -71,12 +72,19 @@ public:
 		TS_ASSERT_EQUALS(message.isValid, 1);
 		TS_ASSERT_EQUALS(message.tx_len, 10);
 		I2CConsoleDumpCommand(&message);
-//
+
 		resetMessage(&message);
 		TS_ASSERT_EQUALS(I2CConsoleParser(input5.c_str(), &message), 0);
 		TS_ASSERT_EQUALS(message.command, SET_SLOW);
 		TS_ASSERT_EQUALS(message.isValid, 1);
 		TS_ASSERT_EQUALS(message.isDelayBetweenBytes, 0);
+		I2CConsoleDumpCommand(&message);
+
+		resetMessage(&message);
+		TS_ASSERT_EQUALS(I2CConsoleParser(input6.c_str(), &message), 0);
+		TS_ASSERT_EQUALS(message.command, PING);
+		TS_ASSERT_EQUALS(message.isValid, 1);
+		TS_ASSERT_EQUALS(message.address, 0x23);
 		I2CConsoleDumpCommand(&message);
 	}
 
