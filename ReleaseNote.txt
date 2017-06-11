@@ -15,8 +15,9 @@
 *** DONE change SerialDebugPrint* api & test src
     SCHEDULED: <2017-06-10 Sat>
     - State "DONE"       from "INPROGRESS" [2017-06-10 Sat 17:10]
-*** INPROGRESS move i2c-console parser to module & callback management
-*** WAIT GPS breakout board to output to softserial
+*** DONE move i2c-console parser to module & callback management
+    - State "DONE"       from "INPROGRESS" [2017-06-10 Sat 21:02]
+*** INPROGRESS GPS breakout board to output to softserial
 
 * WAIT v2.1.0 - Google test support & C sensor library support
 ** add common/makefiles/gtest.mk
