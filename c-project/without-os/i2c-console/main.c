@@ -7,21 +7,18 @@
 #include "I2CConsole.h"
 #include "SerialDebug.h"
 #include "PgmStorage.h"
-#include "Timer.h"
-#include "I2C.h"
 #include "Millis.h"
 
 #include <stdio.h>
 #include <util/delay.h>
 
-
-const char PROGMEM helpaddr1[] = "Hint address: LCD 0x28, compass 0x19";
 const char PROGMEM help1[] = "Sample command \t\t - explanation (command case insensitive)";
 const char PROGMEM help2[] = "ADDR 28 \t\t - set i2c 7-bit address as 0x28";
 const char PROGMEM help3[] = "TX 2 00 03 \t\t - send 2 bytes 0x00 and 0x03";
 const char PROGMEM help0[] = "TX \"hello world\" \t - send string \"hello world\"";
 const char PROGMEM help4[] = "RX 6 2 ab 03 \t\t - send 2 bytes 0xab and 0x03, receive 6 bytes back to rx";
 const char PROGMEM help41[] = "SLOW 0 \t\t\t - set slow sending off";
+const char PROGMEM help42[] = "PING 23 \t\t - check if address 0x23 is alive";
 const char PROGMEM helploop1[] = "LOOP 2 TX 2 00 03 \t - loop the command 'TX 2 00 03' for 2 seconds";
 const char PROGMEM helploop2[] = "LOOP 5 RX 6 1 ab \t - loop the command 'RX 6 1 ab' for 5 seconds";
 const char PROGMEM help5[] = "---------------";
@@ -37,9 +34,6 @@ void processMessage(const char * buffer);
 void showHelp()
 {
 	char msg[PGM_SIZE];
-
-	PgmStorageGet(msg, helpaddr1);
-	SerialDebugPrint(msg);
 
 	PgmStorageGet(msg, help1);
 	SerialDebugPrint(msg);
@@ -57,6 +51,9 @@ void showHelp()
 	SerialDebugPrint(msg);
 
 	PgmStorageGet(msg, help41);
+	SerialDebugPrint(msg);
+
+	PgmStorageGet(msg, help42);
 	SerialDebugPrint(msg);
 
 	PgmStorageGet(msg, helploop1);
@@ -187,14 +184,37 @@ void showHistory()
 void runScan()
 {
 	uint8_t device_addr;
+	I2CConsoleMessage msg;
+	char foundDevice = 0;
 
 	SerialDebugPrint("Scanning for devices ...");
 	for (device_addr = 0; device_addr < 128; ++device_addr)
 	{
-		if (!I2CCheckAlive(device_addr))
+		char buff[20];
+		snprintf(buff, 20, "ping %x", device_addr);
+
+		if (!I2CConsoleParser(buff, &msg))
 		{
-			SerialDebugPrint("Found device 0x%x", device_addr);
+			uint8_t sendResult = I2CConsoleSendCommand(&msg);
+			if (!sendResult)
+			{
+				SerialDebugPrint("Found device 0x%x", device_addr);
+				foundDevice = 1;
+			}
+			else
+			{
+				LOG("Error code %d for %s", sendResult, buff);
+			}
 		}
+		else
+		{
+			LOG("Error parsing %s", buff);
+		}
+	}
+
+	if (!foundDevice)
+	{
+		SerialDebugPrint("No I2C device found");
 	}
 }
 
@@ -220,14 +240,14 @@ void parseNRunMessage(const char * message)
 		uint8_t sendResult = I2CConsoleSendCommand(&cmd);
 		if (sendResult == 0)
 		{
-			SerialDebugPrint("sent %s", message);
+			SerialDebugPrint("OK - '%s'", message);
 
 			if (cmd.command == SENDNRECV)
 			{
 				SerialDebugPrint("RX result:");
 				for (i = 0; i < cmd.rx_len; ++i)
 				{
-					SerialDebugPrint(" rx[%d] = 0x%x = %d = '%c'", i, cmd.rx[i],
+					SerialDebugPrint(" rx[%d] = 0x%x \t= %d \t= '%c'", i, cmd.rx[i],
 							cmd.rx[i], cmd.rx[i]);
 				}
 			}

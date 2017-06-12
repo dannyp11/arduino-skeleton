@@ -84,15 +84,35 @@ void SerialDebugInitWithBaudRate(unsigned baudrate)
 /*
  * Printf to serial port
  */
-void _SerialDebugPrint1(const char* message)
+/**
+ *
+ *
+ * @param format
+ * @param args
+ */
+static void _mSDPrint(const char* format, va_list args)
 {
-	sci_outs(message);
-	sci_outs("\n\r");
+	char buffer[STRING_MAXLEN];
+	vsnprintf(buffer, STRING_MAXLEN, format, args);
+	sci_outs(buffer);
 }
 
-void _SerialDebugPrintNoEndl(const char* message)
+void SerialDebugPrint(const char* format, ...)
 {
-	sci_outs(message);
+	va_list args;
+	va_start(args, format);
+	_mSDPrint(format, args);
+	sci_out('\n');
+	sci_out('\r');
+	va_end(args);
+}
+
+void SerialDebugPrintNoEndl(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	_mSDPrint(format, args);
+	va_end(args);
 }
 
 uint8_t isDefaultStopCharacter(char c)

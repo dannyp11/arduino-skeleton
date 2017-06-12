@@ -14,7 +14,7 @@ INCLUDES = ./
 # unit test files
 # remember to put cxx test headers in test/*Test.h
 UNITTEST_SUPPORT = true
-TEST_SOURCES = I2CConsole.c I2CConsoleStack.c
+TEST_SOURCES = I2CConsoleParser.c I2CConsoleStack.c
 TEST_DEBUG = no
 TEST_CFLAGS = -std=gnu++0x
 

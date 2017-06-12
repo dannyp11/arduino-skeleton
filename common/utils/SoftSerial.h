@@ -8,9 +8,6 @@
 #ifndef UTILS_SOFTSERIAL_H_
 #define UTILS_SOFTSERIAL_H_
 
-#include <stdarg.h>
-#include "MemoryFree.h"
-
 // TX pin config
 #define SS_TX_PIN		PB1
 #define SS_PORT_TX		PORTB

@@ -42,6 +42,7 @@ int main(void)
 			SerialDebugPrint(" 0x%x \t= %d \t= '%c'", buffer[i], buffer[i], buffer[i]);
 			++i;
 		}
+		TRACE_INT("hello")
 
 		_delay_ms(1);
 	}
