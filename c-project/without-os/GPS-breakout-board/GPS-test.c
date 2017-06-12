@@ -7,6 +7,7 @@
 
 #include "NMEAParser.h"
 #include "SerialDebug.h"
+#include "SoftSerial.h"
 #include "LCD.h"
 
 #include <util/delay.h>
@@ -16,6 +17,7 @@ int main(void)
 {
 	LCDInit();
 	SerialDebugInitWithBaudRate(9600);
+	SoftSerialInit();
 	double distance = 0.0f;
 	NMEAData initLocation, prevData;
 	initLocation.isValid = 0;
@@ -32,7 +34,7 @@ int main(void)
 
 		if (!initLocation.isValid)
 		{
-			SerialDebugPrint("Failed initial parsed message: %s", gps_msg);
+			SoftSerialPrintLn("Failed initial parsed message: %s", gps_msg);
 		}
 	}
 
@@ -50,22 +52,22 @@ int main(void)
 
 		if (gpsData.isValid && parseResult == 0)
 		{
-			SerialDebugPrint("Parse succeeds, message %s", gps_msg);
-			SerialDebugPrint("lat %d %lf", gpsData.location.lat_deg,
+			SoftSerialPrintLn("Parse succeeds, message %s", gps_msg);
+			SoftSerialPrintLn("lat %d %lf", gpsData.location.lat_deg,
 					gpsData.location.lat_min);
-			SerialDebugPrint("lon %d %lf", gpsData.location.lon_deg,
+			SoftSerialPrintLn("lon %d %lf", gpsData.location.lon_deg,
 					gpsData.location.lon_min);
 
 			distance += NMEAGetDistance(&prevData.location, &gpsData.location);
-			SerialDebugPrint("traveled distance %.2lf m", distance);
+			SoftSerialPrintLn("traveled distance %.2lf m", distance);
 
 			double angle = NMEAGetAngle(&initLocation.location, &gpsData.location);
-			SerialDebugPrint("angle from initial location %.2lf degrees", angle);
+			SoftSerialPrintLn("angle from initial location %.2lf degrees", angle);
 
 			double distanceToInitPlace = NMEAGetDistance(&initLocation.location, &gpsData.location);
-			SerialDebugPrint(" %4.0lf m to initial place", distanceToInitPlace);
+			SoftSerialPrintLn(" %4.0lf m to initial place", distanceToInitPlace);
 
-			SerialDebugPrint(" ");
+			SoftSerialPrintLn(" ");
 
 			LCDSetCursor(1,0);
 			LCDPrint("traveled %.2lf m", distance);

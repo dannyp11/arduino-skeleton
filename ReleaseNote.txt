@@ -1,3 +1,5 @@
+RelNote -*- mode : org -*-
+
 # Release Note
 * DONE v1.0.0 - all-C projects
 ** I2C console via serial port: make I2C debugging easier
@@ -11,17 +13,24 @@
 ** DONE Support Arduino IDE framework (Arduino Makefile)
 ** DONE skeleton.mk is one-stop .mk for all projects, include it at the end of project's makefile
 ** DONE create libutils.a
-** INPROGRESS v2.0.1 - migrate SerialDebugPrint api to non-macro, restructure i2c-console parser
+** DONE v2.0.1 - migrate SerialDebugPrint api to non-macro, restructure i2c-console parser
+   - State "DONE"       from "INPROGRESS" [2017-06-11 Sun 23:01]
 *** DONE change SerialDebugPrint* api & test src
     SCHEDULED: <2017-06-10 Sat>
     - State "DONE"       from "INPROGRESS" [2017-06-10 Sat 17:10]
 *** DONE move i2c-console parser to module & callback management
     - State "DONE"       from "INPROGRESS" [2017-06-10 Sat 21:02]
-*** INPROGRESS GPS breakout board to output to softserial
+*** DONE GPS breakout board to output to softserial
+    - State "DONE"       from "INPROGRESS" [2017-06-11 Sun 22:54]
 
 * WAIT v2.1.0 - Google test support & C sensor library support
 ** add common/makefiles/gtest.mk
 *** add simple gtest project
+** full range adc & pin change interrupt C support
 ** motion sensor test code
 ** hand clap sound detector
-** full range adc & pin change interrupt C support
+* WAIT v2.2.0 - more integrated module in i2c-console
+** LSM303DLHC support: compass & accelerator in test/
+*** accelerometer support
+*** compass support
+*** i2c-console support

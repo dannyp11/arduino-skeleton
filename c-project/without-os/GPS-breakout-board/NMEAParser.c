@@ -418,7 +418,6 @@ double NMEAGetAngle(const NMEALocation * a, const NMEALocation * b)
 	double latb = toRadian(b->lat_deg, b->lat_min);
 	double lonb = toRadian(b->lon_deg, b->lon_min);
 
-	double dlat = (latb - lata);
 	double dlon = (lonb - lona);
 
 	double y = sin(dlon) * cos(latb);
