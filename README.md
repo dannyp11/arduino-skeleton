@@ -6,6 +6,7 @@ Currently works with Unix system, compatible with Arduino framework (setup/loop)
 * Note: 
   1. This repo now supports Arduino IDE, only need to set IDE_SUPPORT to true from skeleton.mk
   2. Even though it supports C++ project, I will try to develop drivers/low level in C
+  3. When in doubt, run make help in project directory for variable config
 
 # Directory Structure
         +---test/                               - all component testers go here, test code uses no os
@@ -26,7 +27,14 @@ Currently works with Unix system, compatible with Arduino framework (setup/loop)
 	
 # UnitTest framework (Software)
         This repo supports cxxtest framework, run make check will invoke testgen and run the test binary
-        Put all test headers in test directory of project directory, see c-project/without-os/GPS-breakout-board for example
+        Put all test headers in test directory of project directory
+        Name test headers as *Test.h 
+        See c-project/without-os/GPS-breakout-board for example
+        
+        This repo also supports googletest framework. Similarly run make check
+        Put all test headers in test directory of project directory
+       	Name test files as *gtest.cpp
+       	See test/gtest for example
 
 # Usage
         go to c*-project/with*-os/ directory and use its makefile

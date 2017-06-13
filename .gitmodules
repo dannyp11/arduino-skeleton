@@ -4,3 +4,6 @@
 [submodule "submodules/ChibiOS"]
 	path = submodules/ChibiOS
 	url = https://github.com/ChibiOS/ChibiOS
+[submodule "submodules/googletest"]
+	path = submodules/googletest
+	url = https://github.com/google/googletest

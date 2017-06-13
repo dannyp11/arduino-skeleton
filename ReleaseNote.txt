@@ -23,12 +23,14 @@ RelNote -*- mode : org -*-
 *** DONE GPS breakout board to output to softserial
     - State "DONE"       from "INPROGRESS" [2017-06-11 Sun 22:54]
 
-* WAIT v2.1.0 - Google test support & C sensor library support
-** add common/makefiles/gtest.mk
-*** add simple gtest project
-** full range adc & pin change interrupt C support
-** motion sensor test code
-** hand clap sound detector
+* INPROGRESS v2.1.0 - Google test support & C sensor library support
+** DONE add common/makefiles/gtest.mk
+   - State "DONE"       from "INPROGRESS" [2017-06-12 Mon 20:05]
+*** DONE add simple gtest project
+    - State "DONE"       from "INPROGRESS" [2017-06-12 Mon 20:05]
+** INPROGRESS full range adc & pin change interrupt C support
+** TODO motion sensor test code
+** TODO hand clap sound detector
 * WAIT v2.2.0 - more integrated module in i2c-console
 ** LSM303DLHC support: compass & accelerator in test/
 *** accelerometer support

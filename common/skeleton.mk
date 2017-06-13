@@ -35,6 +35,7 @@ INCLUDES ?= ./
 
 OPTIMIZE ?= YES
 UNITTEST_SUPPORT ?= no
+GTEST_SUPPORT ?= no
 UTILS_SUPPORT ?= no
 FLOAT_SUPPORT ?= no
 DEBUG ?= no
@@ -82,10 +83,15 @@ endif
 TEST_SOURCES ?=
 TEST_HEADERS ?= $(wildcard test/*Test.h) 
 TEST_CC =clang++
-TEST_CFLAGS += -g -O0 -Wall -Wextra -DCXXTEST=1
+TEST_AR =ar
+TEST_CFLAGS += -g -O0 -Wall -Wextra -DCXXTEST=1 -DGTEST=1
 
-ifneq ($(filter $(UNITTEST_SUPPORT), $(TRUE)),) # check if -DDEBUG should be added
+ifneq ($(filter $(UNITTEST_SUPPORT), $(TRUE)),) # cxxtest
 include $(MKFILES_DIR)/unittest.mk
+endif
+
+ifneq ($(filter $(GTEST_SUPPORT), $(TRUE)),) # gtest
+include $(MKFILES_DIR)/gtest.mk
 endif
 
 ifneq ($(filter $(TEST_DEBUG), $(TRUE)),) # check if -DDEBUG should be added
@@ -117,7 +123,8 @@ Compiler        CFLAGS          add to cflag of avr gcc         $(CFLAGS)
                 *INCLUDES       list of directories to include  $(INCLUDES)
                 *SOURCES        all .c and .cpp files           $(SOURCES)
 
-SW Unittest     UNITTEST_SUPPORT                                $(UNITTEST_SUPPORT) 
+SW Unittest     UNITTEST_SUPPORT cxx test  support              $(UNITTEST_SUPPORT) 
+                GTEST_SUPPORT   Google test support             $(GTEST_SUPPORT)
                 TEST_SOURCES    files to be tested              $(TEST_SOURCES)
                                 (required if UNITTEST_SUPPORT is enabled)
                 TEST_HEADERS    list of .h files for cxxtest    $(TEST_HEADERS)
