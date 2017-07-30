@@ -1,0 +1,32 @@
+# Set up notification options
+notifications: 
+  email:
+    recipients:
+      - deptrainhatkhoi@yahoo.com
+
+    # change is when the repo status goes from pass to fail or vice versa
+    on_success: change
+    on_failure: always
+
+# specify language
+language: cpp
+
+# non-root build
+sudo: false
+
+# specify language options
+cpp:
+- '4.8.5'
+
+os:
+- linux
+
+# configure which branches to run
+branches:
+  # whitelist
+  only:
+    - master
+    - devel
+
+compiler: 
+- c++
