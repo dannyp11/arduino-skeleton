@@ -12,7 +12,7 @@ notifications:
 language: cpp
 
 # non-root build
-sudo: false
+sudo: true
 
 # specify language options
 
@@ -31,3 +31,7 @@ compiler:
 
 script: 
 - make check
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y gcc-avr binutils-avr avr-libc arduino

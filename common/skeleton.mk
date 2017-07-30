@@ -16,6 +16,8 @@ PROGRAMMER = -c arduino -P $(TTY) -b 115200
 # Directory path ####################################################################
 OS_DIR     = $(TOP)/submodules/ChibiOS/
 ARDUINO_MAKEFILE_DIR = $(TOP)/submodules/Arduino-Makefile
+CXXTEST_DIR = $(TOP)/submodules/cxxtest
+GTEST_DIR = $(TOP)/submodules/googletest
 UTILS_DIR  = $(TOP)/common/utils/
 MKFILES_DIR = $(TOP)/common/makefiles/
 

@@ -8,3 +8,6 @@
 	path = submodules/googletest
 	url = https://github.com/google/googletest
     ignore = dirty
+[submodule "submodules/cxxtest"]
+	path = submodules/cxxtest
+	url = https://github.com/CxxTest/cxxtest

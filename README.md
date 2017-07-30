@@ -1,4 +1,6 @@
 # arduino-skeleton
+[![Build Status](https://travis-ci.org/dannyp11/arduino-skeleton.svg?branch=master)](https://travis-ci.org/dannyp11/arduino-skeleton)
+
 This is the first embarkment of my learning experience & side projects. Let's see how far I could go :)
 Skeleton framework for Arduino with/without RTOS, uses avr gcc/ g++
 Currently works with Unix system, compatible with Arduino framework (setup/loop) using sudar's repo

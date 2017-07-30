@@ -38,6 +38,9 @@ RelNote -*- mode : org -*-
    - State "DONE"       from "CANCELED"   [2017-07-30 Sun 13:45]
 ** DONE avoid recompiling gtest library every time running make check
    - State "DONE"       from "CANCELED"   [2017-07-30 Sun 13:46]
+** DONE integrate Travis CI in project
+   - State "DONE"       from "FEEDBACK"   [2017-07-30 Sun 16:39]
+   - State "FEEDBACK"   from "INPROGRESS" [2017-07-30 Sun 16:39]
 ** TODO motion sensor test code
 ** TODO hand clap sound detector
 * WAIT v2.2.0 - more integrated module in i2c-console
