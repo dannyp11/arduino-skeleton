@@ -15,8 +15,6 @@ language: cpp
 sudo: false
 
 # specify language options
-cpp:
-- '4.8.5'
 
 os:
 - linux
@@ -29,4 +27,7 @@ branches:
     - devel
 
 compiler: 
-- c++
+- clang++
+
+script: 
+- make check
