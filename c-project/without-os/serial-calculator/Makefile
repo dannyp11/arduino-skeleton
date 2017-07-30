@@ -12,10 +12,12 @@ TOP = ../../../
 
 # unit test files
 # remember to put cxx test headers in test/*Test.h
-UNITTEST_SUPPORT = yes
+# or gtest test .cpp files in test/*gtest.cpp
+UNITTEST_SUPPORT = no
+GTEST_SUPPORT = yes
 TEST_SOURCES = InfixConverter.c PostfixCalculator.c $(UTILS_DIR)/AVRString.c
 TEST_DEBUG = no
-TEST_CFLAGS = -std=gnu++0x
+TEST_CFLAGS = -fno-stack-protector
 
 # always include skeleton.mk
 include $(TOP)/common/skeleton.mk

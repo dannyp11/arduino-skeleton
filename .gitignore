@@ -10,6 +10,9 @@
 *.hex
 *.d
 *.a
+*.h.cpp
+*.ocxx
+*.cxxtest
 
 # Packages #
 ############
@@ -29,6 +32,7 @@
 *.log
 *.sql
 *.sqlite
+*.gdb_history
 
 # OS generated files #
 ######################

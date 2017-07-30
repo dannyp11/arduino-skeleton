@@ -8,6 +8,10 @@
 #ifndef SERIAL_CALCULATOR_INFIXCONVERTER_H_
 #define SERIAL_CALCULATOR_INFIXCONVERTER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <inttypes.h>
 
 /**
@@ -24,5 +28,9 @@
  * 			- 2 on unsupported char
  */
 uint8_t InfixConverterConvertString(const char * input, char * output);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SERIAL_CALCULATOR_INFIXCONVERTER_H_ */

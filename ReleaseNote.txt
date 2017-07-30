@@ -28,7 +28,16 @@ RelNote -*- mode : org -*-
    - State "DONE"       from "INPROGRESS" [2017-06-12 Mon 20:05]
 *** DONE add simple gtest project
     - State "DONE"       from "INPROGRESS" [2017-06-12 Mon 20:05]
-** INPROGRESS full range adc & pin change interrupt C support
+** WAIT full range adc & pin change interrupt C support
+** DONE add checking dependency in fresh repo clone
+   - State "DONE"       from "FEEDBACK"   [2017-07-29 Sat 20:14]
+   - State "FEEDBACK"   from "INPROGRESS" [2017-07-29 Sat 20:14]
+** DONE fix segfault & stack smashing in serial calc project
+   - State "DONE"       from "CANCELED"   [2017-07-30 Sun 13:45]
+** DONE move serial calc project unittest to gtes
+   - State "DONE"       from "CANCELED"   [2017-07-30 Sun 13:45]
+** DONE avoid recompiling gtest library every time running make check
+   - State "DONE"       from "CANCELED"   [2017-07-30 Sun 13:46]
 ** TODO motion sensor test code
 ** TODO hand clap sound detector
 * WAIT v2.2.0 - more integrated module in i2c-console

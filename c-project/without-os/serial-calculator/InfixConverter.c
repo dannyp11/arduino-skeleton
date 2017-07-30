@@ -8,11 +8,15 @@
 #include "InfixConverter.h"
 #include "AVRString.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
-const char g_infix_supported_ops[] = "+-*/()";
+static const char g_infix_supported_ops[] = "+-*/()";
 
 /**
  * Compare precedence between a and b
@@ -100,10 +104,11 @@ uint8_t addSpaces(char * buffer)
 		}
 	}
 	buffer2[index2] = '\0';
-	AVRStrinStripExtraSpace(buffer2);
-	AVRStringTrimWhiteSpace(buffer2);
+	char * buffer3 = buffer2;
+	AVRStrinStripExtraSpace(buffer3);
+	AVRStringTrimWhiteSpace(buffer3);
 
-	strcpy(buffer, buffer2);
+	strcpy(buffer, buffer3);
 
 	return 0;
 }
@@ -298,8 +303,13 @@ uint8_t InfixConverterConvertString(const char * input, char * output)
 	}
 	else
 	{
-		strcpy(output, AVRStringTrimWhiteSpace(output));
+		strcpy(output_tmp, AVRStringTrimWhiteSpace(output));
+		strcpy(output, output_tmp);
 	}
 
 	return retVal;
 }
+
+#ifdef __cplusplus
+}
+#endif

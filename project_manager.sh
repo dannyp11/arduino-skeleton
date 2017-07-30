@@ -101,6 +101,12 @@ function checkDependency()
         print_warning "Missing arduino ide, which is required for Arduino-makefile submodule, please install arduino"
     fi
     
+    # check avr
+    if [ -z "$(which avr-gcc 2>/dev/null)" ] || [ -z "$(which avrdude 2>/dev/null)" ]; then  
+        ((retVal=retVal+1))
+        print_warning "Missing avr package, please install gcc-avr binutils-avr gdb-avr avr-libc avrdude"
+    fi    
+    
     return $retVal
 }
 

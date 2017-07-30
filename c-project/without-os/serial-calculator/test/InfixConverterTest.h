@@ -11,12 +11,13 @@
 #include <cxxtest/TestSuite.h>
 #include <string>
 #include <iostream>
-
 #include "InfixConverter.h"
 
 using namespace std;
 
-extern uint8_t addSpaces(char * buffer);
+extern "C" {
+uint8_t addSpaces(char * buffer);
+}
 
 class myTS: public CxxTest::TestSuite
 {

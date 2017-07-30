@@ -4,11 +4,12 @@
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIRNAME := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
 TOP :=$(shell dirname $(MKFILE_PATH))/../../
+TOP :=$(shell readlink -f $(TOP))
 
 # gtest library definition
 GTEST_DIR = $(TOP)/submodules/googletest/googletest
 GTEST_SRC = $(wildcard $(GTEST_DIR)/src/*.cc)
-GTEST_LIB = gtest.a
+GTEST_LIB = $(GTEST_DIR)/gtest.a
 TEST_CFLAGS += -isystem $(GTEST_DIR)/include
 INCLUDES += $(GTEST_DIR)/include/gtest/ $(GTEST_DIR)/include/gtest/internal/  $(GTEST_DIR)/
 LDFLAGS += -pthread -lpthread
@@ -74,5 +75,5 @@ $(GTEST_LIB): $(GTEST_OBJS)
 	
 cleantest:
 	rm -f $(TEST_OBJECTS) $(TEST_BIN_OBJS) $(TEST_BINARIES)
-	rm -f $(GTEST_LIB) $(GTEST_OBJS)
+    # no need to remove GTEST_SRC and GTEST_LIB since we don't edit gtest src
 
