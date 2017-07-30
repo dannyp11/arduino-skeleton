@@ -16,6 +16,8 @@ PROGRAMMER = -c arduino -P $(TTY) -b 115200
 # Directory path ####################################################################
 OS_DIR     = $(TOP)/submodules/ChibiOS/
 ARDUINO_MAKEFILE_DIR = $(TOP)/submodules/Arduino-Makefile
+CXXTEST_DIR = $(TOP)/submodules/cxxtest
+GTEST_DIR = $(TOP)/submodules/googletest
 UTILS_DIR  = $(TOP)/common/utils/
 MKFILES_DIR = $(TOP)/common/makefiles/
 
@@ -100,6 +102,9 @@ TEST_CFLAGS  += -DDEBUG=1 -g -O0
 endif
 
 ## help menu #########################################################################
+GCC_COLOR=\033[1;34m
+SRC_COLOR=\033[1;35m
+NO_COLOR=\033[0;0m
 define helpMenu
 --------------------------------------------------------------------------------------
 Configurable Variable names (* means required)
@@ -112,31 +117,35 @@ Device          DEVICE          uController chip                $(DEVICE)
 Project         CPP_PROJECT     is C++ project?                 $(CPP_PROJECT)  
                 WITH_OS         uses ChibiOS?                   $(WITH_OS)
                 UTILS_SUPPORT   utils such as i2c, debug, etc.  $(UTILS_SUPPORT)
-                UTILS_DIR	path to utils source code	$(UTILS_DIR)
+                UTILS_DIR       path to utils source code       $(UTILS_DIR)
                 FLOAT_SUPPORT   support float printf/scanf      $(FLOAT_SUPPORT)
                 IDE_SUPPORT     support ide lib (setup, loop)?  $(IDE_SUPPORT)
                 DEBUG           add -DDEBUG=1 to cflags         $(DEBUG)       
-                OPTIMIZE	enable optimization?		$(OPTIMIZE) 
+                OPTIMIZE        enable optimization?            $(OPTIMIZE) 
                 PROJECT_NAME    name of project                 $(PROJECT_NAME)
 
-Compiler        CFLAGS          add to cflag of avr gcc         $(CFLAGS)
-                CPPFLAGS	add to c++ flags of avr g++	$(CPPFLAGS)
-                *INCLUDES       list of directories to include  $(INCLUDES)
-                *SOURCES        all .c and .cpp files           $(SOURCES)
+Compiler        CFLAGS          add to cflag of avr gcc         $(GCC_COLOR)$(CFLAGS)$(NO_COLOR)
+                CPPFLAGS        add to c++ flags of avr g++     $(GCC_COLOR)$(CPPFLAGS)$(NO_COLOR)
+                *INCLUDES       list of directories to include  $(SRC_COLOR)$(INCLUDES)$(NO_COLOR)
+                
+                *SOURCES        all .c and .cpp files           $(SRC_COLOR)$(SOURCES)$(NO_COLOR)
 
 SW Unittest     UNITTEST_SUPPORT cxx test  support              $(UNITTEST_SUPPORT) 
                 GTEST_SUPPORT   Google test support             $(GTEST_SUPPORT)
-                TEST_SOURCES    files to be tested              $(TEST_SOURCES)
+                TEST_SOURCES    files to be tested              $(SRC_COLOR)$(TEST_SOURCES)$(NO_COLOR)
                                 (required if UNITTEST_SUPPORT is enabled)
-                TEST_HEADERS    list of .h files for cxxtest    $(TEST_HEADERS)
+                TEST_HEADERS    list of .h files for cxxtest    $(SRC_COLOR)$(TEST_HEADERS)$(NO_COLOR)
                                 usually inside proj/test/
                 TEST_DEBUG      add -DDEBUG flag to unittest?   $(TEST_DEBUG)
                 TEST_CC         g++ of unit test                $(TEST_CC)
-                TEST_CFLAGS     cflags of unit test             $(TEST_CFLAGS)
+                TEST_CFLAGS     cflags of unit test             $(GCC_COLOR)$(TEST_CFLAGS)$(NO_COLOR)
 --------------------------------------------------------------------------------------
 endef
 export helpMenu
+export GCC_COLOR
+export NO_COLOR
+export SRC_COLOR
 help:
 	@$(TOP)/project_manager.sh -t 'Skeleton help menu:'
-	@echo  "$$helpMenu"
+	@echo -e "$$helpMenu"
         

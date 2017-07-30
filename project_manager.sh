@@ -40,13 +40,18 @@ print_warning()
 # run all make check in directory recursively
 function checkFolder()
 {
+    local retVal=0
 	find "$1" -name Makefile | while read line; do		
-                local TEST_DIR=$(dirname $line)/test/
-                if [ -d "$TEST_DIR" ] ; then
-                	print_title "Checking in $(dirname ${line})" ;	
-                        make -C $(dirname $line) check BRIEF=1 -j4
-                fi		
-	done		
+        local TEST_DIR=$(dirname $line)/test/
+        if [ -d "$TEST_DIR" ] ; then
+        	print_title "Checking in $(dirname ${line})"
+            make -C $(dirname $line) check BRIEF=1 -j4
+            
+            ((retVal = retVal + $?))
+        fi		
+	done
+	
+	return $retVal		
 }
 
 # run make clean in dir recursively
@@ -60,24 +65,29 @@ function cleanFolder()
 # run make all in dir recursively
 function makeFolder()
 {
-	find "$1" -name Makefile | while read line; do	
-	        print_title "Compile in $(dirname ${line})..." ;
-	        
-	        if (($FULL_REPORT == 0)) ; then
-                  make -C $(dirname $line) all -j4 > /dev/null
-	        else
-	          make -C $(dirname $line) all -j4
-	        fi	
-		
-		local MK_RESULT=$?
+    local retVal=0
 
-		if (($MK_RESULT!=0)) ; then
-			print_warning "Error code $MK_RESULT on compiling $(dirname $line)"
-			if (($FORCE_CONTINUE == 0)) ; then
-				exit $MK_RESULT
-			fi
-		fi
-	done		
+	find "$1" -name Makefile | while read line; do	
+        print_title "Compile in $(dirname ${line})..." ;
+        
+        if (($FULL_REPORT == 0)) ; then
+              make -C $(dirname $line) all -j4 > /dev/null
+        else
+          make -C $(dirname $line) all -j4
+        fi	
+		
+	    local MK_RESULT=$?
+	    ((retVal=retVal + MK_RESULT))
+
+	    if (($MK_RESULT!=0)) ; then
+		    print_warning "Error code $MK_RESULT on compiling $(dirname $line)"
+		    if (($FORCE_CONTINUE == 0)) ; then
+			    exit $MK_RESULT
+		    fi
+	    fi
+	done
+	
+	return $retVal		
 }
 
 function checkDependency()

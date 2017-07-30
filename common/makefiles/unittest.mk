@@ -5,6 +5,11 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIRNAME := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
 TOP :=$(shell dirname $(MKFILE_PATH))/../../
 
+# cxxtest dir & pkg config
+CXXTEST_DIR ?=$(TOP)/submodules/cxxtest
+INCLUDES += $(CXXTEST_DIR)
+CXXTEST_GEN ?=$(CXXTEST_DIR)/bin/cxxtestgen
+
 # test objects definition
 TEST_OBJECTS	= $(patsubst %.cpp, %.ocxx, $(TEST_SOURCES))
 TEST_OBJECTS	+= $(patsubst %.c, %.ocxx, $(TEST_SOURCES))
@@ -22,7 +27,7 @@ IFLAGS	 = $(foreach d, $(INCLUDES), -I$d)
 # main rules to run
 ##########################################################################################
 TEST_GEN: 
-	$(foreach f, $(TEST_HEADERS), cxxtestgen --error-printer -o $(f).cpp $(f) ; )
+	$(foreach f, $(TEST_HEADERS), $(CXXTEST_GEN) --error-printer -o $(f).cpp $(f) ; )
 	$(MAKE) test_compile
 
 ifneq ($(filter $(BRIEF), $(TRUE)),) # check if compile message should be output, BRIEF means no

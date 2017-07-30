@@ -1,0 +1,37 @@
+# Set up notification options
+notifications: 
+  email:
+    recipients:
+      - deptrainhatkhoi@yahoo.com
+
+    # change is when the repo status goes from pass to fail or vice versa
+    on_success: change
+    on_failure: always
+
+# specify language
+language: cpp
+
+# non-root build
+sudo: true
+
+# specify language options
+
+os:
+- linux
+
+# configure which branches to run
+branches:
+  # whitelist
+  only:
+    - master
+    - devel
+
+compiler: 
+- clang++
+
+script: 
+- make check
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y gcc-avr binutils-avr avr-libc arduino
