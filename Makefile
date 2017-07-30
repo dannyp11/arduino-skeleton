@@ -11,7 +11,7 @@ check:
 	$(TOP)/project_manager.sh -k common/
         
 # comipile all projects
-compile:        
+compile:
 	$(TOP)/project_manager.sh -T
 	$(TOP)/project_manager.sh -m test/
 	$(TOP)/project_manager.sh -f -m c-project/ 

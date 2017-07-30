@@ -91,14 +91,14 @@ function checkDependency()
     do
         if [ -z "$(ls -A $D)" ]; then
             ((retVal=retVal+1))
-            printWarning "Missing submodule $D, perhaps you forgot to run git submodule update --init --recursive"
+            print_warning "Missing submodule $D, perhaps you forgot to run git submodule update --init --recursive"
         fi
     done
     
     # check arduino ide
     if [ -z "$(which arduino 2>/dev/null)" ]; then  
         ((retVal=retVal+1))
-        printWarning "Missing arduino ide, which is required for Arduino-makefile submodule, please install arduino"
+        print_warning "Missing arduino ide, which is required for Arduino-makefile submodule, please install arduino"
     fi
     
     return $retVal
