@@ -4,6 +4,7 @@ TOP = ./
 .PHONY: compile
 # run all unit tests in all folders
 check:
+	$(TOP)/project_manager.sh -T
 	$(TOP)/project_manager.sh -k test/
 	$(TOP)/project_manager.sh -k c-project/
 	$(TOP)/project_manager.sh -k cpp-project/
@@ -11,6 +12,7 @@ check:
         
 # comipile all projects
 compile:        
+	$(TOP)/project_manager.sh -T
 	$(TOP)/project_manager.sh -m test/
 	$(TOP)/project_manager.sh -f -m c-project/ 
 	$(TOP)/project_manager.sh -f -m cpp-project/ 

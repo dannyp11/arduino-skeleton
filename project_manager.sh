@@ -80,6 +80,29 @@ function makeFolder()
 	done		
 }
 
+function checkDependency()
+{
+    local retVal=0
+    
+    # check submodules
+    # for each dir in submodules
+    local TOP=$(dirname $(readlink -f $0))
+    for D in `find $TOP/submodules/ -maxdepth 1 -mindepth 1 -type d`
+    do
+        if [ -z "$(ls -A $D)" ]; then
+            ((retVal=retVal+1))
+            printWarning "Missing submodule $D, perhaps you forgot to run git submodule update --init --recursive"
+        fi
+    done
+    
+    # check arduino ide
+    if [ -z "$(which arduino 2>/dev/null)" ]; then  
+        ((retVal=retVal+1))
+        printWarning "Missing arduino ide, which is required for Arduino-makefile submodule, please install arduino"
+    fi
+    
+    return $retVal
+}
 
 function showHelp()
 {
@@ -91,14 +114,16 @@ cat << EOF
         -k dir  search in dir recursively and run make check
         -m dir	search in dir recursively and run make all
         
+        -T      check dependency
         -f      force continue on make error, default: $FORCE_CONTINUE
         -l      full report, default: $FULL_REPORT
+        -h      this menu
 EOF
 }
 
 # main ##############################################################
 # getopt
-while getopts ":c:k:m:t:fl" o; do
+while getopts ":c:k:m:t:flT" o; do
     case "${o}" in
         c)
             cleanFolder ${OPTARG}            
@@ -117,6 +142,9 @@ while getopts ":c:k:m:t:fl" o; do
             ;;
         l)
             FULL_REPORT=1
+            ;;
+        T)
+            checkDependency
             ;;
         *)
             showHelp
