@@ -82,9 +82,10 @@ endif
 # Unittest config #####################################################################
 TEST_SOURCES ?=
 TEST_HEADERS ?= $(wildcard test/*Test.h) 
-TEST_CC =clang++
+TEST_CC =g++
 TEST_AR =ar
 TEST_CFLAGS += -g -O0 -Wall -Wextra -DCXXTEST=1 -DGTEST=1
+TEST_DEBUG ?=$(DEBUG)
 
 ifneq ($(filter $(UNITTEST_SUPPORT), $(TRUE)),) # cxxtest
 include $(MKFILES_DIR)/unittest.mk
@@ -95,7 +96,7 @@ include $(MKFILES_DIR)/gtest.mk
 endif
 
 ifneq ($(filter $(TEST_DEBUG), $(TRUE)),) # check if -DDEBUG should be added
-TEST_CFLAGS  += -DDEBUG=1
+TEST_CFLAGS  += -DDEBUG=1 -g -O0
 endif
 
 ## help menu #########################################################################
