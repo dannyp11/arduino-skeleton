@@ -8,6 +8,10 @@
 #include "InfixConverter.h"
 #include "AVRString.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -305,3 +309,7 @@ uint8_t InfixConverterConvertString(const char * input, char * output)
 
 	return retVal;
 }
+
+#ifdef __cplusplus
+}
+#endif

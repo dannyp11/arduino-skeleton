@@ -10,6 +10,9 @@
 *.hex
 *.d
 *.a
+*.h.cpp
+*.ocxx
+*.cxxtest
 
 # Packages #
 ############
