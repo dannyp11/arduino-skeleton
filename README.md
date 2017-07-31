@@ -1,5 +1,9 @@
 # arduino-skeleton
 [![Build Status](https://travis-ci.org/dannyp11/arduino-skeleton.svg?branch=master)](https://travis-ci.org/dannyp11/arduino-skeleton)
+<a href="https://scan.coverity.com/projects/dannyp11-arduino-skeleton">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/13324/badge.svg"/>
+</a>
 
 This is the first embarkment of my learning experience & side projects. Let's see how far I could go :)
 Skeleton framework for Arduino with/without RTOS, uses avr gcc/ g++
