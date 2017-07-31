@@ -43,14 +43,14 @@ ifneq ($(filter $(BRIEF), $(TRUE)),) # check if compile message should be output
 check: 
 	@$(MAKE) TEST_GEN -j4 > /dev/null 
 	@printf "Running test binaries \n\n"
-	-$(foreach bin, $(TEST_BINARIES), ./$(bin) ; )
+	$(foreach bin, $(TEST_BINARIES), ./$(bin) ; )
 	@printf "\nDone running tests\n"
 	@$(MAKE) cleantest > /dev/null
 else
 check: 
 	$(MAKE) TEST_GEN -j4
 	@printf "Running test binaries \n\n"
-	-$(foreach bin, $(TEST_BINARIES), ./$(bin) ; )
+	$(foreach bin, $(TEST_BINARIES), ./$(bin) ; )
 	@printf "\nDone running tests\n"
 	$(MAKE) cleantest > /dev/null
 endif
