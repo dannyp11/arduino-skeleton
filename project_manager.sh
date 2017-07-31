@@ -13,7 +13,7 @@ FORCE_CONTINUE=0
 FULL_REPORT=1
 
 RETVAL_FILE=.retVal.tmp # file contains return value of script, useful for travis
-rm -f $RETVAL_FILE # rm retval file first
+echo "0">$RETVAL_FILE # rm retval file first
 
 # print colored title
 print_title()
@@ -141,20 +141,20 @@ function checkDependency()
     for D in `find $TOP/submodules/ -maxdepth 1 -mindepth 1 -type d`
     do
         if [ -z "$(ls -A $D)" ]; then
-            ((retVal=retVal+1))
+            updateRetval 1
             print_warning "Missing submodule $D, perhaps you forgot to run git submodule update --init --recursive"
         fi
     done
     
     # check arduino ide
     if [ -z "$(which arduino 2>/dev/null)" ]; then  
-        ((retVal=retVal+1))
+        updateRetval 1
         print_warning "Missing arduino ide, which is required for Arduino-makefile submodule, please install arduino"
     fi
     
     # check avr
     if [ -z "$(which avr-gcc 2>/dev/null)" ] || [ -z "$(which avrdude 2>/dev/null)" ]; then  
-        ((retVal=retVal+1))
+        updateRetval 1
         print_warning "Missing avr package, please install gcc-avr binutils-avr gdb-avr avr-libc avrdude"
     fi
 }
