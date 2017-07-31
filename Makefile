@@ -5,17 +5,12 @@ TOP = ./
 # run all unit tests in all folders
 check:
 	$(TOP)/project_manager.sh -T
-	$(TOP)/project_manager.sh -k test/
-	$(TOP)/project_manager.sh -k c-project/
-	$(TOP)/project_manager.sh -k cpp-project/
-	$(TOP)/project_manager.sh -k common/
+	$(TOP)/project_manager.sh -k test c-project cpp-project common
         
 # comipile all projects
-compile:
+compile:        
 	$(TOP)/project_manager.sh -T
-	$(TOP)/project_manager.sh -m test/
-	$(TOP)/project_manager.sh -f -m c-project/ 
-	$(TOP)/project_manager.sh -f -m cpp-project/ 
+	$(TOP)/project_manager.sh -fm test c-project cpp-project
 	
 # clean all projects for maintaining purpose
 clean:

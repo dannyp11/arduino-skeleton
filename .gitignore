@@ -13,6 +13,8 @@
 *.h.cpp
 *.ocxx
 *.cxxtest
+tmp/
+build-uno/
 
 # Packages #
 ############
