@@ -10,7 +10,7 @@ SCRIPT_DIR_RELATIVE=$0
 
 # global vars
 FORCE_CONTINUE=0
-FULL_REPORT=1
+BRIEF_REPORT=0
 
 RETVAL_FILE=.retVal.tmp # file contains return value of script, useful for travis
 echo "0">$RETVAL_FILE # rm retval file first
@@ -63,7 +63,12 @@ function checkFolder()
         local TEST_DIR=$(dirname $line)/test/
         if [ -d "$TEST_DIR" ] ; then
         	print_title "Checking in $(dirname ${line})"
-            make -C $(dirname $line) check BRIEF=1 -j4       
+        	
+        	if [ $BRIEF_REPORT != 0 ]; then
+                make -C $(dirname $line) check BRIEF=1 -j4
+            else
+                make -C $(dirname $line) check -j4
+            fi
             updateRetval $?
         fi		
 	done
@@ -99,7 +104,7 @@ function makeFolder()
 	find "$1" -name Makefile | while read line; do	
         print_title "Compile in $(dirname ${line})..." ;
         
-        if (($FULL_REPORT == 0)) ; then
+        if (($BRIEF_REPORT != 0)) ; then
             make -C $(dirname $line) all -j4 > /dev/null
         else
             make -C $(dirname $line) all -j4
@@ -171,7 +176,7 @@ cat << EOF
         
         -T      check dependency
         -f      force continue on make error, default: $FORCE_CONTINUE
-        -l      set FULL_REPORT=0, default: $FULL_REPORT
+        -b      set brief report
         -h      this menu
 EOF
 }
@@ -188,11 +193,13 @@ CHECK_DIR=0
 COMPILE_DIR=0
 
 # getopt
-while getopts ":c:kmt:flT" o; do
+while getopts ":c:kbmt:fT" o; do
     case "${o}" in
         c)
             cleanFolder ${OPTARG}            
-            exit $?            
+            retVal=$?
+            rm -f $RETVAL_FILE            
+            exit $retVal            
             ;;
         k)
             CHECK_DIR=1
@@ -206,8 +213,8 @@ while getopts ":c:kmt:flT" o; do
         f)
             FORCE_CONTINUE=1
             ;;
-        l)
-            FULL_REPORT=0            
+        b)
+            BRIEF_REPORT=1            
             ;;
         T)
             checkDependency

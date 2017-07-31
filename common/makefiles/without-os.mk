@@ -5,7 +5,9 @@ FUSES      = -U hfuse:w:0xd9:m -U lfuse:w:0xe0:m
 
 # default variable values
 SOURCES ?= $(wildcard *.c) $(wildcard *.cpp)
+SOURCES := $(shell readlink -f $(SOURCES))
 INCLUDES ?= ./
+INCLUDES := $(shell readlink -f $(INCLUDES))
 
 # generate object names
 OBJECTS	 = $(patsubst %.cpp, %.o, $(SOURCES))
@@ -33,6 +35,7 @@ LIBUTILS = $(OBJ_DIR)libutils.a
 UTILS_SOURCES ?= $(wildcard $(UTILS_DIR)/*.c) $(wildcard $(UTILS_DIR)/*.cpp)
 endif
 UTILS_DIR  ?= $(TOP)/common/utils/
+UTILS_DIR := $(shell readlink -f $(UTILS_DIR))
 UTILS_INCLUDEFLAGS ?= -I$(UTILS_DIR)
 
 UTILS_OBJECTS	 = $(patsubst %.cpp, %.cpp.libo, $(UTILS_SOURCES))
