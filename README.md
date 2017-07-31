@@ -4,6 +4,8 @@
   <img alt="Coverity Scan Build Status"
        src="https://scan.coverity.com/projects/13324/badge.svg"/>
 </a>
+[![Release](https://img.shields.io/badge/Release-2.1.0-green.svg)]
+[![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
 This is the first embarkment of my learning experience & side projects. Let's see how far I could go :)
 Skeleton framework for Arduino with/without RTOS, uses avr gcc/ g++
